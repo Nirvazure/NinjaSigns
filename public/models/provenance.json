@@ -1,0 +1,90 @@
+{
+  "repository": "Kazuhito00/NARUTO-HandSignDetection",
+  "revision": "07f4d3231f43f97cbd37653c793825f1dbc94d0e",
+  "records": [
+    {
+      "url": "https://raw.githubusercontent.com/Kazuhito00/NARUTO-HandSignDetection/07f4d3231f43f97cbd37653c793825f1dbc94d0e/model/yolox/yolox_nano.onnx",
+      "path": "public/models/yolox_nano.onnx",
+      "bytes": 3610160,
+      "sha256": "8a12da84bdf35fa68f11a53aca1e775f49c8545995a21e54b5a32be2d19d9901"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Kazuhito00/NARUTO-HandSignDetection/07f4d3231f43f97cbd37653c793825f1dbc94d0e/LICENSE",
+      "path": "public/models/LICENSE.txt",
+      "bytes": 1074,
+      "sha256": "fff07d3a4a0cb836196738a334130ab28c4701a4eea7a17e0d25abdec6c95f01"
+    },
+    {
+      "url": "https://user-images.githubusercontent.com/37477845/95611897-6d032d00-0a9d-11eb-86c4-de1c50c0d7b6.jpg",
+      "path": "public/images/seals/rat.jpg",
+      "bytes": 174034,
+      "sha256": "45b72e23c929dc8096ec7883613df8e1aade962ee9d34ee9bb109ab635083ec1"
+    },
+    {
+      "url": "https://user-images.githubusercontent.com/37477845/95611906-6ffe1d80-0a9d-11eb-9054-4e68c42e52ca.jpg",
+      "path": "public/images/seals/ox.jpg",
+      "bytes": 169806,
+      "sha256": "3b77666c986edb14bb6c0d88a7bdc0acd4c5c43306d2fd50316a774b1be45c7c"
+    },
+    {
+      "url": "https://user-images.githubusercontent.com/37477845/95611912-712f4a80-0a9d-11eb-8cb8-fc7097e16f60.jpg",
+      "path": "public/images/seals/tiger.jpg",
+      "bytes": 170862,
+      "sha256": "c52f4439cfb19960057d910d103f1a7d933993143df87dcb6ce49e8a338dbca7"
+    },
+    {
+      "url": "https://user-images.githubusercontent.com/37477845/95611915-72607780-0a9d-11eb-9995-66524ce4f978.jpg",
+      "path": "public/images/seals/hare.jpg",
+      "bytes": 170448,
+      "sha256": "18a08d28cd1bd90c62aa5df9261d404bbbd4dd113d26c5d706177b17101fd9f7"
+    },
+    {
+      "url": "https://user-images.githubusercontent.com/37477845/95611920-7391a480-0a9d-11eb-8e74-db39acf90f83.jpg",
+      "path": "public/images/seals/dragon.jpg",
+      "bytes": 178721,
+      "sha256": "396160eef8b3f6828a633097cb610f94f201f5b723e0807f3a3f1ef041f2142d"
+    },
+    {
+      "url": "https://user-images.githubusercontent.com/37477845/95611922-742a3b00-0a9d-11eb-8a21-8bdf207db9bb.jpg",
+      "path": "public/images/seals/snake.jpg",
+      "bytes": 170916,
+      "sha256": "83689dc73ae58562ee08428a2057d0f988595cafedefb76d7223ba52493ffd42"
+    },
+    {
+      "url": "https://user-images.githubusercontent.com/37477845/95611928-755b6800-0a9d-11eb-86c0-67605ffd6e9b.jpg",
+      "path": "public/images/seals/horse.jpg",
+      "bytes": 170822,
+      "sha256": "1f0f082e5d22aa4959ef159027e4e85a51158ba3ab22bce6e162f0e31d1ffb90"
+    },
+    {
+      "url": "https://user-images.githubusercontent.com/37477845/95611930-768c9500-0a9d-11eb-81c6-067b632dc43d.jpg",
+      "path": "public/images/seals/ram.jpg",
+      "bytes": 169598,
+      "sha256": "f85bf0fa7a17896f13f93d22b042ed7b7ebca201c2cf56ba54095883da3308e6"
+    },
+    {
+      "url": "https://user-images.githubusercontent.com/37477845/95611931-77252b80-0a9d-11eb-97d6-e3efc6f1aac3.jpg",
+      "path": "public/images/seals/monkey.jpg",
+      "bytes": 173378,
+      "sha256": "545b01d7e97a79478af77a9beb7133177a514f6a6339f22ec51858b553a2be8c"
+    },
+    {
+      "url": "https://user-images.githubusercontent.com/37477845/95611935-77bdc200-0a9d-11eb-95e1-feb8bf7f61de.jpg",
+      "path": "public/images/seals/bird.jpg",
+      "bytes": 182296,
+      "sha256": "b015b664936dfa433539e988669d56cfdae1141d732eecb0f484cf6584f8404e"
+    },
+    {
+      "url": "https://user-images.githubusercontent.com/37477845/95611936-78eeef00-0a9d-11eb-90b3-f565e4763c50.jpg",
+      "path": "public/images/seals/dog.jpg",
+      "bytes": 180033,
+      "sha256": "0264dd79639e68f23d4176ed8125d502261fc9db1c4ffa831781d1ef6bbde7b5"
+    },
+    {
+      "url": "https://user-images.githubusercontent.com/37477845/95611938-7a201c00-0a9d-11eb-9d5f-1daf2405f20f.jpg",
+      "path": "public/images/seals/boar.jpg",
+      "bytes": 168217,
+      "sha256": "40e498aaba32edd0d445c3bc48c47527f1d1cba8d6f586c565309b23b1e60f30"
+    }
+  ]
+}

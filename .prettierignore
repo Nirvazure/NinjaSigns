@@ -1,0 +1,11 @@
+node_modules
+.nuxt
+.nuxt-*
+.output
+coverage
+playwright-report
+test-results
+yarn.lock
+public/runtime
+public/models
+public/images

@@ -1,0 +1,45 @@
+{
+  "name": "naruto-spiritism",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "dev:mvp": "node scripts/dev.mjs",
+    "check:dev": "node scripts/check-dev.mjs",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "typecheck": "nuxt typecheck",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "validate:model": "node scripts/validate-model.mjs",
+    "assets:sync": "node scripts/sync-assets.mjs"
+  },
+  "dependencies": {
+    "@fontsource/ma-shan-zheng": "^5.3.1",
+    "@fontsource/noto-sans-sc": "^5.3.0",
+    "@fontsource/press-start-2p": "^5.3.0",
+    "lucide-vue-next": "^0.468.0",
+    "nuxt": "^4.6.0",
+    "onnxruntime-web": "1.24.3",
+    "vue": "^3.5.43",
+    "vue-router": "^5.3.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "@playwright/test": "^1.58.2",
+    "eslint": "^9.39.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-vue": "^10.8.0",
+    "prettier": "^3.8.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.57.0",
+    "vitest": "^4.0.18",
+    "vue-eslint-parser": "^10.3.0",
+    "vue-tsc": "^3.2.5"
+  }
+}
