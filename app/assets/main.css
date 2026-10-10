@@ -11,6 +11,30 @@
   --green: #385e43;
   --blue: #235f79;
   --gold: #bd9851;
+  --nature-neutral: #475c4a;
+  --nature-neutral-ink: #28382d;
+  --nature-neutral-paper: #e9e5d0;
+  --nature-neutral-light: #d1d5b4;
+  --nature-wind: #2d6851;
+  --nature-wind-ink: #193b32;
+  --nature-wind-paper: #e2eddf;
+  --nature-wind-light: #a3c59a;
+  --nature-lightning: #8c671d;
+  --nature-lightning-ink: #3c3422;
+  --nature-lightning-paper: #f1e6bd;
+  --nature-lightning-light: #e7c87a;
+  --nature-water: #286c88;
+  --nature-water-ink: #15384b;
+  --nature-water-paper: #deedf0;
+  --nature-water-light: #9acddc;
+  --nature-fire: #af4230;
+  --nature-fire-ink: #482722;
+  --nature-fire-paper: #f4e0d1;
+  --nature-fire-light: #efb397;
+  --nature-earth: #805c3b;
+  --nature-earth-ink: #392f28;
+  --nature-earth-paper: #eee0c9;
+  --nature-earth-light: #d9bd90;
   --body: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
   --display: 'Ma Shan Zheng', 'KaiTi', 'STKaiti', serif;
   --pixel: 'Press Start 2P', monospace;
@@ -118,16 +142,11 @@ a {
   gap: 16px;
 }
 .brand-mark {
-  display: grid;
-  place-items: center;
-  width: 52px;
-  height: 56px;
-  border: 2px solid var(--paper-light);
-  outline: 2px solid var(--red);
-  outline-offset: 3px;
-  background: var(--red);
-  font: 40px var(--display);
-  transform: rotate(-4deg);
+  display: block;
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  object-fit: contain;
 }
 .brand-text {
   font: 31px/1.2 var(--display);
@@ -344,6 +363,28 @@ a {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+.camera-stage.placeholder .stage-caption,
+.camera-stage.placeholder .stage-bottom,
+.camera-stage.placeholder .stage-bottom > span:last-child {
+  color: var(--ink);
+  text-shadow: none;
+}
+.camera-stage.placeholder .stage-caption::after {
+  content: attr(data-category-glyph);
+  color: var(--paper-light);
+}
+.camera-stage.placeholder .stage-caption {
+  right: 24px;
+  flex-direction: column;
+}
+.camera-stage.placeholder .vertical-title {
+  writing-mode: horizontal-tb;
+  font-size: clamp(28px, 5vw, 44px);
+  overflow-wrap: anywhere;
+}
+.camera-stage.placeholder .stage-subtitle {
+  writing-mode: horizontal-tb;
 }
 .camera-stage > video {
   position: absolute;
@@ -610,6 +651,14 @@ a {
   gap: 8px;
   margin-top: 16px;
 }
+.seal-sequence.long {
+  overflow-x: auto;
+  padding: 4px 4px 12px;
+  scrollbar-width: thin;
+}
+.seal-sequence.long .sequence-item {
+  flex: 0 0 48px;
+}
 .sequence-item {
   flex: 1;
   min-width: 0;
@@ -836,6 +885,11 @@ a {
   font: 22px var(--display);
   padding: 8px 0 12px;
 }
+.jutsu-options {
+  max-height: min(390px, 50vh);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
 .jutsu-option {
   display: flex;
   align-items: center;
@@ -848,20 +902,29 @@ a {
   text-align: left;
 }
 .jutsu-option.selected {
-  background: #dce5ce;
-  border-left: 4px solid var(--green);
+  background: var(--element-soft);
+  border-left: 4px solid var(--element);
   padding-left: 4px;
 }
 .jutsu-option:hover {
   background: #e3d6b4;
 }
 .jutsu-mini {
+  position: relative;
   width: 48px;
   height: 48px;
   flex-shrink: 0;
   overflow: hidden;
   border: 1px solid var(--ink);
   background: var(--ink);
+}
+.jutsu-mini.placeholder > span {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--element);
+  font: 30px var(--display);
 }
 .jutsu-mini img {
   width: 100%;
@@ -1000,125 +1063,403 @@ a {
 .gallery-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 28px;
+  gap: 32px 28px;
+}
+.jutsu-card,
+.jutsu-option,
+.jutsu-element {
+  --element: var(--nature-neutral);
+  --element-ink: var(--nature-neutral-ink);
+  --element-soft: var(--nature-neutral-paper);
+  --element-light: var(--nature-neutral-light);
+}
+.jutsu-card[data-category='风遁'],
+.jutsu-option[data-category='风遁'],
+.jutsu-element[data-element='风遁'] {
+  --element: var(--nature-wind);
+  --element-ink: var(--nature-wind-ink);
+  --element-soft: var(--nature-wind-paper);
+  --element-light: var(--nature-wind-light);
+}
+.jutsu-card[data-category='雷遁'],
+.jutsu-option[data-category='雷遁'],
+.jutsu-element[data-element='雷遁'] {
+  --element: var(--nature-lightning);
+  --element-ink: var(--nature-lightning-ink);
+  --element-soft: var(--nature-lightning-paper);
+  --element-light: var(--nature-lightning-light);
+}
+.jutsu-card[data-category='水遁'],
+.jutsu-option[data-category='水遁'],
+.jutsu-element[data-element='水遁'] {
+  --element: var(--nature-water);
+  --element-ink: var(--nature-water-ink);
+  --element-soft: var(--nature-water-paper);
+  --element-light: var(--nature-water-light);
+}
+.jutsu-card[data-category='火遁'],
+.jutsu-option[data-category='火遁'],
+.jutsu-element[data-element='火遁'] {
+  --element: var(--nature-fire);
+  --element-ink: var(--nature-fire-ink);
+  --element-soft: var(--nature-fire-paper);
+  --element-light: var(--nature-fire-light);
+}
+.jutsu-card[data-category='土遁'],
+.jutsu-option[data-category='土遁'],
+.jutsu-element[data-element='土遁'] {
+  --element: var(--nature-earth);
+  --element-ink: var(--nature-earth-ink);
+  --element-soft: var(--nature-earth-paper);
+  --element-light: var(--nature-earth-light);
 }
 .jutsu-card {
-  --element: var(--green);
   position: relative;
-  border: 2px solid var(--ink);
-  border-top: 8px solid var(--element);
-  background: var(--paper-light) url('/images/ui/paper.svg');
-  box-shadow: var(--surface-shadow);
+  min-width: 0;
   display: flex;
   flex-direction: column;
+  border: 1px solid color-mix(in srgb, var(--element) 60%, var(--ink));
+  background: linear-gradient(115deg, var(--element-soft), var(--paper-light) 65%);
+  box-shadow:
+    0 4px 0 #272b2415,
+    0 12px 24px #272b2412;
+  transition: box-shadow var(--motion-fast);
 }
-.jutsu-card[data-jutsu='fireball'] {
-  --element: var(--red);
+.jutsu-card::before,
+.jutsu-card::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  left: -5px;
+  right: -5px;
+  height: 8px;
+  border: 1px solid var(--element-ink);
+  border-radius: 3px;
+  background: linear-gradient(var(--element), var(--element-ink));
+  box-shadow:
+    inset 0 1px 0 #f7edcf40,
+    0 2px 2px #272b2426;
+  pointer-events: none;
 }
-.jutsu-card[data-jutsu='chidori'] {
-  --element: var(--blue);
+.jutsu-card::before {
+  top: -4px;
+}
+.jutsu-card::after {
+  bottom: -4px;
+}
+.jutsu-card:focus-within {
+  outline: 2px solid var(--element);
+  outline-offset: 6px;
+}
+.jutsu-card:hover {
+  box-shadow:
+    0 4px 0 #272b2415,
+    0 14px 28px #272b2424;
 }
 .jutsu-cover {
   position: relative;
-  aspect-ratio: 16/10;
+  isolation: isolate;
   overflow: hidden;
-  background: #19231d;
-  border-bottom: 2px solid var(--ink);
-}
-.jutsu-cover img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.cover-category {
-  position: absolute;
-  left: 16px;
-  top: 16px;
-  background: var(--element);
-  color: var(--paper-light);
-  padding: 6px 12px;
-  border: 1px solid var(--paper-light);
-  font-size: 12px;
-}
-.cover-glyph {
-  position: absolute;
-  right: 16px;
-  bottom: 8px;
-  font: 68px var(--display);
-  color: #f7edcfbb;
-  text-shadow: 2px 2px 0 #000;
-}
-.jutsu-card-body {
-  padding: 24px;
-  flex: 1;
+  min-height: 184px;
   display: flex;
   flex-direction: column;
+  gap: 18px;
+  padding: 20px 24px;
+  color: var(--paper-light);
+  background: var(--element-ink);
+  background-image: repeating-linear-gradient(90deg, transparent 0 7px, #f7edcf03 7px 8px);
+  border-bottom: 3px double var(--element);
+}
+.jutsu-cover::after {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 1px solid #f7edcf20;
+  pointer-events: none;
+  z-index: -1;
+}
+.jutsu-cover-art {
+  position: absolute;
+  z-index: -1;
+  inset: 0 0 0 auto;
+  width: 60%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.48;
+  mask-image: linear-gradient(90deg, transparent, #000 60%);
 }
 .jutsu-card-meta {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 8px;
-  color: var(--muted);
+  gap: 12px;
   font-size: 12px;
+}
+.jutsu-archive-number {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--element-light);
+  letter-spacing: 0.06em;
 }
 .mastery-badge {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 5px 7px;
-  border: 1px solid var(--muted);
-  color: var(--muted);
+  gap: 4px;
+  padding: 4px 7px;
+  border: 1px solid #f7edcf6b;
+  color: var(--paper-light);
   font-size: 12px;
   white-space: nowrap;
 }
 .mastery-badge.mastered {
-  border: 3px double var(--red);
-  color: var(--red);
+  border: 3px double var(--paper-light);
+  background: var(--red);
   font-family: var(--display);
-  font-size: 19px;
-  transform: rotate(-6deg);
+  font-size: 18px;
+  transform: rotate(-5deg);
 }
-.jutsu-card h2 {
-  font: 34px var(--display);
-  margin: 22px 0 12px;
+.jutsu-card .cover-title {
+  position: relative;
+  z-index: 1;
+  max-width: 85%;
+  margin: 0;
+  font: 34px/1.3 var(--display);
+  text-wrap: balance;
+  overflow-wrap: anywhere;
 }
-.jutsu-card p {
+.cover-glyph {
+  position: absolute;
+  z-index: -1;
+  right: 20px;
+  bottom: 12px;
+  display: grid;
+  place-items: center;
+  width: 108px;
+  height: 108px;
+  border: 3px double color-mix(in srgb, var(--element-light) 22%, transparent);
+  border-radius: 50%;
+  color: color-mix(in srgb, var(--element-light) 22%, transparent);
+  font: 78px/1 var(--display);
+  transform: rotate(-12deg);
+}
+.jutsu-cover-caption {
+  margin-top: auto;
+  color: var(--element-light);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+}
+.jutsu-card-body {
+  min-width: 0;
+  padding: 0 24px 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.jutsu-attributes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.jutsu-element,
+.jutsu-attack,
+.jutsu-attack-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.jutsu-element {
+  min-width: 0;
+  color: var(--element);
+}
+.jutsu-nature-mark {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+}
+.jutsu-nature-copy {
+  min-width: 0;
+}
+.compact .jutsu-nature-mark {
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--element);
+  border-radius: 50%;
+  background: var(--element-soft);
+}
+.jutsu-nature-copy strong {
+  font: 500 12px/1.5 var(--body);
+}
+.jutsu-attack {
+  color: var(--muted);
+  white-space: nowrap;
+}
+.jutsu-attack-label svg {
+  color: var(--element, var(--red));
+}
+.jutsu-attack b {
+  color: var(--ink);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.jutsu-attributes.scroll {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 96px;
+  gap: 16px;
+  padding: 20px 0;
+  border-bottom: 1px dashed color-mix(in srgb, var(--element) 45%, var(--line));
+}
+.scroll .jutsu-element {
+  gap: 12px;
+}
+.scroll .jutsu-nature-mark {
+  width: 48px;
+  height: 48px;
+  border: 3px double var(--element);
+  border-radius: 50%;
+  background: var(--element-soft);
+  box-shadow: inset 0 0 0 3px var(--paper-light);
+}
+.scroll .jutsu-nature-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.scroll .jutsu-nature-copy small {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.scroll .jutsu-nature-copy strong {
+  font: 25px/1.2 var(--display);
+}
+.scroll .jutsu-attack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 89px;
+  gap: 3px;
+  padding-left: 16px;
+  border-left: 1px solid var(--line);
+}
+.scroll .jutsu-attack b {
+  font: 600 34px/1.1 var(--body);
+  color: var(--element);
+}
+.jutsu-power-track {
+  display: flex;
+  gap: 3px;
+  width: 100%;
+  margin-top: 3px;
+}
+.jutsu-power-track i {
+  height: 4px;
+  flex: 1;
+  background: color-mix(in srgb, var(--element) 15%, var(--paper));
+}
+.jutsu-power-track i.filled {
+  background: var(--element);
+}
+.jutsu-support-label {
+  font-size: 12px;
+  color: var(--muted);
+}
+.jutsu-option-copy > .jutsu-attributes {
+  gap: 5px 10px;
+}
+.jutsu-card .jutsu-description {
+  min-height: 50px;
+  margin-top: 16px;
   color: var(--muted);
   font-size: 14px;
   line-height: 1.8;
-  min-height: 52px;
 }
-.gallery-sequence {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 4px;
+.jutsu-seal-scroll {
   margin: 20px 0 24px;
 }
-.gallery-sequence > span {
-  width: 32px;
-  height: 36px;
+.jutsu-seal-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  color: var(--ink);
+  font-size: 13px;
+}
+.jutsu-seal-heading > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.jutsu-seal-heading small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.gallery-sequence {
   display: grid;
-  place-items: center;
-  border: 1px solid var(--line);
-  background: var(--paper);
-  font: 24px var(--display);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.gallery-sequence li {
+  position: relative;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 64px;
+  padding: 10px 4px 6px;
+  border: 1px solid color-mix(in srgb, var(--element) 40%, var(--line));
+  background: color-mix(in srgb, var(--element-soft) 55%, var(--paper-light));
+  box-shadow: inset 0 0 0 3px var(--paper-light);
+}
+.seal-step-index {
+  position: absolute;
+  top: 3px;
+  left: 5px;
+  color: var(--muted);
+  font: 10px/1 var(--body);
+  font-variant-numeric: tabular-nums;
+}
+.seal-step-glyph {
+  font: 28px/1 var(--display);
   color: var(--element);
 }
-.gallery-sequence svg {
+.gallery-sequence small {
   color: var(--muted);
+  font-size: 12px;
 }
 .jutsu-card-actions {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding-top: 18px;
+  padding-top: 16px;
   border-top: 1px solid var(--line);
   margin-top: auto;
 }
 .jutsu-card-actions .primary-button {
   flex: 1;
+}
+.jutsu-card .jutsu-practice-button {
+  min-height: 48px;
+  color: var(--paper-light);
+  background: var(--element-ink);
+  border-color: var(--element-ink);
+  box-shadow: 3px 3px 0 color-mix(in srgb, var(--element) 45%, transparent);
+}
+.jutsu-card .jutsu-practice-button:hover {
+  background: color-mix(in srgb, var(--element-ink) 85%, var(--element));
+}
+.jutsu-card-actions .icon-button {
+  border-color: var(--element);
+  color: var(--element);
+  background: var(--paper-light);
 }
 .gallery-bottom {
   display: flex;
@@ -1246,19 +1587,14 @@ a {
     padding: 20px;
   }
   .jutsu-card-body {
-    padding: 18px;
+    padding: 0 20px 20px;
   }
   .gallery-grid {
-    gap: 18px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px 20px;
   }
   .jutsu-card h2 {
     font-size: 30px;
-  }
-  .gallery-sequence {
-    gap: 3px;
-  }
-  .gallery-sequence > span {
-    width: 28px;
   }
   .jutsu-card-meta {
     flex-wrap: wrap;
@@ -1293,19 +1629,10 @@ a {
     max-height: 260px;
   }
   .gallery-grid {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 28px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px 20px;
   }
-  .jutsu-card {
-    display: grid;
-    grid-template-columns: 42% minmax(0, 1fr);
-  }
-  .jutsu-cover {
-    aspect-ratio: auto;
-    min-height: 300px;
-    border-bottom: 0;
-    border-right: 2px solid var(--ink);
-  }
+
   .seal-gallery {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -1322,9 +1649,8 @@ a {
     gap: 12px;
   }
   .brand-mark {
-    width: 40px;
-    height: 44px;
-    font-size: 32px;
+    width: 48px;
+    height: 48px;
   }
   .brand-text {
     font-size: 26px;
@@ -1513,30 +1839,22 @@ a {
     flex-wrap: wrap;
     gap: 16px;
   }
-  .jutsu-card {
-    display: flex;
+  .gallery-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
   .jutsu-cover {
-    aspect-ratio: 16/10;
-    min-height: 0;
-    border-right: 0;
-    border-bottom: 2px solid var(--ink);
+    min-height: 176px;
+    padding: 20px;
   }
   .jutsu-card-body {
-    padding: 20px;
+    padding: 0 20px 20px;
   }
   .jutsu-card h2 {
     font-size: 34px;
   }
-  .jutsu-card p {
+  .jutsu-card .jutsu-description {
     min-height: 0;
-  }
-  .gallery-sequence {
-    justify-content: flex-start;
-    gap: 8px;
-  }
-  .gallery-sequence > span {
-    width: 30px;
+    font-size: 16px;
   }
   .seal-gallery {
     grid-template-columns: repeat(2, minmax(0, 1fr));

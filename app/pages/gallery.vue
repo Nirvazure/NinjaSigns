@@ -1,22 +1,14 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
 import { useRoute, useRouter, useSeoMeta } from '#imports'
-import {
-  ScrollText,
-  ArrowUpRight,
-  Eye,
-  Check,
-  ArrowRight,
-  X,
-  Hand,
-  CircleAlert,
-} from 'lucide-vue-next'
-import { JUTSUS, SEALS, getSeal } from '../domain/catalog'
+import { ScrollText, ArrowUpRight, Eye, ArrowRight, X, CircleAlert } from 'lucide-vue-next'
+import { JUTSUS, SEALS } from '../domain/catalog'
 import { useMastery } from '../composables/useMastery'
 import { useCastAudio } from '../composables/useCastAudio'
 import EffectCanvas from '../components/EffectCanvas.vue'
 import type { JutsuDefinition } from '../domain/types'
 import NinjaGallery from '../components/NinjaGallery.vue'
+import JutsuCard from '../components/JutsuCard.vue'
 import { useNinjaCollection } from '../composables/useNinjaCollection'
 
 useSeoMeta({ title: '忍术展览馆 · 结印修炼场' })
@@ -45,6 +37,7 @@ watch(
   { immediate: true },
 )
 async function preview(jutsu: JutsuDefinition) {
+  if (!jutsu.effect) return
   if (!previewJutsu.value) {
     previewTrigger.value =
       document.activeElement?.tagName === 'BUTTON'
@@ -87,7 +80,9 @@ function trapDialogFocus(event: { key: string; shiftKey: boolean; preventDefault
       <p class="eyebrow">木叶秘藏 · 忍术图鉴</p>
       <h1>忍术展览馆</h1>
     </div>
-    <span class="heading-tag"><ScrollText :size="15" />已掌握 {{ count }} / 3</span>
+    <span class="heading-tag"
+      ><ScrollText :size="15" />已掌握 {{ count }} / {{ JUTSUS.length }}</span
+    >
   </div>
   <div class="gallery-topline">
     <div class="mode-control gallery-tabs" aria-label="展览馆分类">
@@ -122,51 +117,14 @@ function trapDialogFocus(event: { key: string; shiftKey: boolean; preventDefault
     <CircleAlert :size="17" />{{ companionWarning }}
   </p>
   <div v-if="tab === 'jutsu'" class="gallery-grid">
-    <article
+    <JutsuCard
       v-for="(jutsu, index) in JUTSUS"
       :key="jutsu.id"
-      class="jutsu-card"
-      :data-jutsu="jutsu.id"
-    >
-      <div class="jutsu-cover">
-        <img :src="jutsu.cover" :alt="jutsu.shortName + '演出'" /><span class="cover-category">{{
-          jutsu.category
-        }}</span
-        ><span class="cover-glyph">{{
-          jutsu.id === 'summoning' ? '契' : jutsu.id === 'fireball' ? '火' : '雷'
-        }}</span>
-      </div>
-      <div class="jutsu-card-body">
-        <div class="jutsu-card-meta">
-          <span>忍术之卷 {{ String(index + 1).padStart(2, '0') }}</span
-          ><span class="mastery-badge" :class="{ mastered: !!mastery[jutsu.id] }"
-            ><Check v-if="mastery[jutsu.id]" :size="12" />{{
-              mastery[jutsu.id] ? '已掌握' : '未掌握'
-            }}</span
-          >
-        </div>
-        <h2>{{ jutsu.shortName }}</h2>
-        <p>{{ jutsu.description }}</p>
-        <div class="gallery-sequence">
-          <template v-for="(seal, i) in jutsu.sequence" :key="i"
-            ><span :title="getSeal(seal).animal + '印'">{{ getSeal(seal).name }}</span
-            ><ArrowRight v-if="i < jutsu.sequence.length - 1" :size="10"
-          /></template>
-        </div>
-        <div class="jutsu-card-actions">
-          <NuxtLink :to="`/?jutsu=${jutsu.id}`" class="primary-button"
-            ><Hand :size="16" />开始修炼<ArrowUpRight :size="14" /></NuxtLink
-          ><button
-            class="icon-button"
-            :aria-label="`预览${jutsu.shortName}`"
-            :title="`预览${jutsu.shortName}`"
-            @click="preview(jutsu)"
-          >
-            <Eye :size="19" />
-          </button>
-        </div>
-      </div>
-    </article>
+      :jutsu="jutsu"
+      :index="index"
+      :mastered="!!mastery[jutsu.id]"
+      @preview="preview"
+    />
   </div>
   <div v-else-if="tab === 'seals'" class="seal-gallery">
     <article v-for="(seal, index) in SEALS" :key="seal.id" class="seal-card">
@@ -191,7 +149,7 @@ function trapDialogFocus(event: { key: string; shiftKey: boolean; preventDefault
     <span>木叶忍术档案</span
     ><span>{{
       tab === 'jutsu'
-        ? '三卷忍术，待你掌握。'
+        ? `${JUTSUS.length} 卷忍术，待你掌握。`
         : tab === 'seals'
           ? '十二枚印，万千变化。'
           : '二十五位忍者，与你并肩修行。'

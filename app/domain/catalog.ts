@@ -1,4 +1,14 @@
-import type { JutsuDefinition, JutsuId, SealDefinition, SealId } from './types'
+import { JUTSU_DATA } from './jutsu-data'
+import type {
+  JutsuBusinessData,
+  JutsuDefinition,
+  JutsuId,
+  JutsuPresentation,
+  SealDefinition,
+  SealId,
+} from './types'
+
+export { JUTSU_IDS } from './jutsu-data'
 
 export const SEALS: readonly SealDefinition[] = [
   {
@@ -99,41 +109,39 @@ export const SEALS: readonly SealDefinition[] = [
   },
 ]
 
-export const JUTSUS: readonly JutsuDefinition[] = [
-  {
-    id: 'summoning',
-    name: '通灵之术',
-    shortName: '通灵之术',
-    category: '时空间忍术',
-    description: '缔结契约，唤醒并肩作战的伙伴。',
-    sequence: ['boar', 'dog', 'bird', 'monkey', 'ram'],
+const DEFAULT_PRESENTATION: JutsuPresentation = {
+  cover: '/images/ui/paper.svg',
+  color: '#367d65',
+  duration: 0,
+  effect: null,
+}
+
+const JUTSU_PRESENTATION: Readonly<Record<string, JutsuPresentation | undefined>> = {
+  summoning: {
     color: '#367d65',
     duration: 5200,
     cover: '/images/jutsu/summoning.png',
+    effect: 'summoning',
   },
-  {
-    id: 'fireball',
-    name: '火遁 · 豪火球之术',
-    shortName: '豪火球之术',
-    category: '火遁',
-    description: '将查克拉凝聚成炽热的火焰。',
-    sequence: ['snake', 'ram', 'monkey', 'boar', 'horse', 'tiger'],
+  fireball: {
     color: '#bc493b',
     duration: 3400,
     cover: '/images/jutsu/fireball.png',
+    effect: 'fireball',
   },
-  {
-    id: 'chidori',
-    name: '雷遁 · 千鸟',
-    shortName: '千鸟',
-    category: '雷遁',
-    description: '千鸟鸣动，雷光汇聚于掌心。',
-    sequence: ['ox', 'hare', 'monkey'],
+  chidori: {
     color: '#337e9c',
     duration: 3800,
     cover: '/images/jutsu/chidori.png',
+    effect: 'chidori',
   },
-]
+}
+
+export function withJutsuPresentation<T extends JutsuBusinessData>(data: T): T & JutsuPresentation {
+  return { ...data, ...(JUTSU_PRESENTATION[data.id] ?? DEFAULT_PRESENTATION) }
+}
+
+export const JUTSUS: readonly JutsuDefinition[] = JUTSU_DATA.map(withJutsuPresentation)
 
 export function getSeal(id: SealId): SealDefinition {
   return SEALS.find((seal) => seal.id === id)!

@@ -12,7 +12,7 @@ const { entries, ready, unlockedCount, selectedNinja, selectNinja } = useNinjaCo
         <p class="eyebrow">每一次结印，都离伙伴更近</p>
         <h2>与你并肩的忍者</h2>
       </div>
-      <p>已结识 {{ unlockedCount }} / {{ entries.length }} 位 · 成功施术解锁伙伴</p>
+      <p>已结识 {{ unlockedCount }} / {{ entries.length }} 位 · 掌握忍术解锁伙伴</p>
     </div>
     <div class="ninja-grid">
       <article

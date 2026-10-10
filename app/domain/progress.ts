@@ -1,4 +1,5 @@
 import type { JutsuId } from './types'
+import { JUTSU_IDS } from './jutsu-data'
 
 export type Mastery = Partial<Record<JutsuId, { casts: number; lastCastAt: string }>>
 export const PROGRESS_KEY = 'naruto-spiritism.progress.v1'
@@ -9,11 +10,13 @@ export function parseMastery(raw: string | null): Mastery {
   if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed))
     throw new Error('收藏记录格式无效')
   const result: Mastery = {}
-  for (const id of ['summoning', 'fireball', 'chidori'] as const) {
+  for (const id of JUTSU_IDS) {
     const record = (parsed as Record<string, unknown>)[id]
-    if (!record) continue
+    if (record === undefined) continue
     if (
+      !record ||
       typeof record !== 'object' ||
+      Array.isArray(record) ||
       !('casts' in record) ||
       !('lastCastAt' in record) ||
       !Number.isSafeInteger(record.casts) ||
