@@ -25,6 +25,10 @@ import { useCameraRecognition } from '../composables/useCameraRecognition'
 import { useMastery } from '../composables/useMastery'
 import { useCastAudio } from '../composables/useCastAudio'
 import type { JutsuId, SealId, RecognitionResult, Point } from '../domain/types'
+import { getNewlyUnlocked, type NinjaDefinition } from '../domain/ninjas'
+import { useNinjaCollection } from '../composables/useNinjaCollection'
+import CompanionPanel from './CompanionPanel.vue'
+import NinjaReward from './NinjaReward.vue'
 
 const route = useRoute(),
   router = useRouter()
@@ -44,6 +48,9 @@ const recognized = ref<RecognitionResult | null>(null),
 const feedback = ref('等待结印'),
   wrong = ref(false)
 const { mastery, warning, markMastered } = useMastery()
+const { warning: companionWarning } = useNinjaCollection()
+const pendingRewards = ref<NinjaDefinition[]>([])
+const rewards = ref<NinjaDefinition[]>([])
 const { muted, prepare, play } = useCastAudio()
 let matcher = new SequenceMatcher(selected.value.sequence)
 const stabilizer = new SealStabilizer()
@@ -73,6 +80,17 @@ function reset() {
   neutralSince = null
   feedback.value = '等待结印'
   wrong.value = false
+  // A completed real cast still deserves its reward if its animation was interrupted.
+  revealRewards()
+}
+
+function revealRewards() {
+  if (!pendingRewards.value.length) return
+  const merged = new Map(
+    [...rewards.value, ...pendingRewards.value].map((ninja) => [ninja.id, ninja]),
+  )
+  rewards.value = [...merged.values()]
+  pendingRewards.value = []
 }
 
 function displayedAnchor(result: RecognitionResult): Point {
@@ -133,7 +151,9 @@ function onResult(result: RecognitionResult) {
     casting.value = true
     previewing.value = false
     feedback.value = '结印完成'
+    const before = mastery.value
     markMastered(selectedId.value)
+    pendingRewards.value = getNewlyUnlocked(before, mastery.value)
     effects.value?.play({
       jutsuId: selectedId.value,
       anchor: displayedAnchor(result),
@@ -206,6 +226,7 @@ function finish() {
   waitingRelease.value = true
   neutralSince = null
   feedback.value = '施术成功 · 松手后继续'
+  revealRewards()
 }
 function fullscreen() {
   if (stage.value)
@@ -372,6 +393,10 @@ onBeforeUnmount(() => {
       <div v-if="warning" class="error-message" role="status">
         <CircleAlert :size="17" /><span>{{ warning }}</span>
       </div>
+      <div v-if="companionWarning" class="error-message" role="status">
+        <CircleAlert :size="17" /><span>{{ companionWarning }}</span>
+      </div>
+      <NinjaReward :ninjas="rewards" @dismiss="rewards = []" />
       <div v-if="mode === 'jutsu'" class="sequence-section">
         <div class="section-title">
           <h2>结印顺序</h2>
@@ -418,6 +443,7 @@ onBeforeUnmount(() => {
       </div>
     </section>
     <aside class="learning-column">
+      <CompanionPanel />
       <div class="section-title">
         <h2>结印手札</h2>
         <span>修行之卷</span>

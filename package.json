@@ -5,7 +5,6 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
-    "dev:mvp": "node scripts/dev.mjs",
     "check:dev": "node scripts/check-dev.mjs",
     "generate": "nuxt generate",
     "preview": "nuxt preview",

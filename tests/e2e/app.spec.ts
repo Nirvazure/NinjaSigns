@@ -214,4 +214,74 @@ test('single-seal replay does not grant a jutsu mastery record', async ({ page }
   await expect(page.locator('.recognition-strip')).toContainText('子印已确认')
   await page.getByRole('link', { name: '忍术展览馆' }).click()
   await expect(page.locator('.mastery-badge').filter({ hasText: '未掌握' })).toHaveCount(3)
+  await page.getByRole('link', { name: '查看忍者收藏' }).click()
+  await expect(page.locator('.ninja-card.unlocked')).toHaveCount(1)
+})
+
+test('real replay grants merged rewards only after the effect and never repeats them', async ({
+  page,
+}) => {
+  test.setTimeout(120000)
+  await replayCamera(page)
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      'naruto-spiritism.progress.v1',
+      JSON.stringify({
+        fireball: { casts: 2, lastCastAt: '2026-10-10T01:00:00Z' },
+      }),
+    )
+  })
+  await page.goto('/?jutsu=chidori')
+  await expect(page.getByRole('link', { name: '查看忍者收藏' })).toContainText('2')
+  await expect(page.locator('.ninja-reward')).toHaveCount(0)
+  await page.getByRole('button', { name: '开启摄像头', exact: true }).click()
+  await expect(page.locator('.stage-status')).toContainText('识别中', {
+    timeout: cameraReadyTimeout,
+  })
+  await setReplaySeal(page, 'rat')
+  await expect(page.locator('.recognition-strip')).toContainText('当前为子印')
+  await expect(page.getByRole('link', { name: '查看忍者收藏' })).toContainText('2')
+  await setReplaySeal(page, null)
+  const jutsu = JUTSUS.find((entry) => entry.id === 'chidori')!
+  for (let cast = 0; cast < 2; cast++) {
+    for (let i = 0; i < jutsu.sequence.length; i++) {
+      await setReplaySeal(page, jutsu.sequence[i]!)
+      await expect(page.locator('.sequence-section .section-title>span')).toHaveText(
+        `${i + 1} / ${jutsu.sequence.length}`,
+      )
+    }
+    await expect(page.locator('.cast-title')).toContainText('结印完成')
+    await expect(page.locator('.ninja-reward')).toHaveCount(0)
+    await expect(page.locator('.cast-title')).toHaveCount(0)
+    if (cast === 0) {
+      await expect(page.locator('.ninja-reward')).toContainText('卡卡西')
+      await expect(page.locator('.ninja-reward')).toContainText('忍者档案 04')
+      await expect(page.locator('.ninja-reward-portraits img')).toHaveCount(2)
+      await expect(page.locator('.companion-panel')).toContainText('鸣人')
+      for (const width of [375, 1440]) {
+        await page.setViewportSize({ width, height: 1000 })
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+          true,
+        )
+        await page.screenshot({ path: `docs/validation/ninja-reward-${width}.png`, fullPage: true })
+      }
+      await page.getByRole('button', { name: '关闭解锁提示' }).click()
+    } else await expect(page.locator('.ninja-reward')).toHaveCount(0)
+    await setReplaySeal(page, null)
+    await expect(page.locator('.recognition-strip')).toContainText('等待下一轮结印')
+  }
+  expect(
+    await page.evaluate(
+      () => JSON.parse(localStorage.getItem('naruto-spiritism.progress.v1')!).chidori.casts,
+    ),
+  ).toBe(2)
+  await page.getByRole('button', { name: '效果预览', exact: true }).click()
+  await expect(page.locator('.cast-title')).toContainText('忍术预览')
+  await expect(page.locator('.cast-title')).toHaveCount(0)
+  await expect(page.locator('.ninja-reward')).toHaveCount(0)
+  expect(
+    await page.evaluate(
+      () => JSON.parse(localStorage.getItem('naruto-spiritism.progress.v1')!).chidori.casts,
+    ),
+  ).toBe(2)
 })

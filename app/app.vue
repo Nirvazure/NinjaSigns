@@ -3,10 +3,12 @@ import { Hand, ScrollText, Swords, ArrowUpRight } from 'lucide-vue-next'
 import { computed } from 'vue'
 import { useRoute } from '#imports'
 import { useMastery } from './composables/useMastery'
+import { useNinjaCollection } from './composables/useNinjaCollection'
 
 const route = useRoute()
 const gallery = computed(() => route.path === '/gallery')
 const { count } = useMastery()
+const { unlockedCount } = useNinjaCollection()
 </script>
 
 <template>
@@ -19,11 +21,22 @@ const { count } = useMastery()
           <span class="brand-text">结印修炼场<small>SHINOBI DOJO</small></span>
         </NuxtLink>
         <div class="village-label">木叶隐村<span>忍道 · 从一枚结印开始</span></div>
-        <NuxtLink to="/gallery" class="collection-summary" aria-label="查看忍术收藏">
-          <ScrollText :size="18" /><span
-            >已掌握<strong>{{ count }}<small> / 3</small></strong></span
+        <div class="header-collections">
+          <NuxtLink to="/gallery" class="collection-summary" aria-label="查看忍术收藏">
+            <ScrollText :size="18" /><span
+              >已掌握<strong>{{ count }}<small> / 3</small></strong></span
+            >
+          </NuxtLink>
+          <NuxtLink
+            to="/gallery?tab=ninjas"
+            class="collection-summary ninja-collection-summary"
+            aria-label="查看忍者收藏"
           >
-        </NuxtLink>
+            <span
+              >忍者<strong>{{ unlockedCount }}<small> / 25</small></strong></span
+            >
+          </NuxtLink>
+        </div>
       </div>
     </header>
     <div class="navigation-wrap">
