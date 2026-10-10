@@ -64,7 +64,7 @@ for (const width of [375, 1440]) {
   })
 }
 
-test('historical casts unlock characters and companion selection survives navigation and reload', async ({
+test('historical unlocks are retained and companion selection survives navigation and reload', async ({
   page,
 }) => {
   await seed(page)
@@ -89,6 +89,48 @@ test('historical casts unlock characters and companion selection survives naviga
     savedProgress,
   )
   await expect(page.locator('.ninja-reward')).toHaveCount(0)
+})
+
+test('new jutsu conditions appear and a fresh player cannot unlock characters by repeated casts', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      'naruto-spiritism.progress.v1',
+      JSON.stringify({
+        fireball: { casts: 200, lastCastAt: '2026-10-10T01:00:00Z' },
+        'shadow-sewing': { casts: 1, lastCastAt: '2026-10-10T01:00:00Z' },
+        'wild-water-wave': { casts: 1, lastCastAt: '2026-10-10T01:00:00Z' },
+      }),
+    )
+    localStorage.setItem('naruto-spiritism.ninja-unlocks.v1', '[]')
+  })
+  await page.goto('/gallery?tab=ninjas')
+  await expect(page.locator('.ninja-card.unlocked')).toHaveCount(3)
+  await expect(page.locator('[data-ninja="ninja-09"]')).toContainText('首次成功施放影缝术')
+  await expect(page.locator('[data-ninja="ninja-09"]').getByRole('button')).toBeEnabled()
+  const tobirama = page.locator('[data-ninja="ninja-17"]')
+  await expect(tobirama).toContainText('掌握水乱波、水弹之术')
+  await expect(tobirama).toContainText('1 / 2')
+  await expect(tobirama.getByRole('button')).toBeDisabled()
+  await expect(page.locator('[data-ninja="ninja-14"]')).toContainText('3 / 4')
+  await page.reload()
+  await expect(page.locator('.ninja-card.unlocked')).toHaveCount(3)
+})
+
+test('a companion unlocked under the old rules remains selected after the upgrade', async ({
+  page,
+}) => {
+  await seed(page, 'ninja-04')
+  await page.goto('/gallery?tab=ninjas')
+  await expect(page.locator('[data-ninja="ninja-04"]')).toContainText('当前伙伴')
+  expect(
+    await page.evaluate(() =>
+      JSON.parse(localStorage.getItem('naruto-spiritism.ninja-unlocks.v1')!),
+    ),
+  ).toContain('ninja-04')
+  await page.reload()
+  await expect(page.locator('[data-ninja="ninja-04"]')).toContainText('当前伙伴')
 })
 
 for (const companion of ['ninja-03', 'ninja-99', '{broken']) {

@@ -1,4 +1,4 @@
-import type { JutsuId, Point } from '../domain/types'
+import type { JutsuEffectId, Point } from '../domain/types'
 
 const TAU = Math.PI * 2
 
@@ -404,7 +404,7 @@ export function renderEffect(
   ctx: CanvasRenderingContext2D,
   width: number,
   height: number,
-  id: JutsuId,
+  id: JutsuEffectId,
   time: number,
   anchor: Point = { x: 0.5, y: 0.55 },
   poster = false,
@@ -419,7 +419,7 @@ export function renderPoster(
   ctx: CanvasRenderingContext2D,
   width: number,
   height: number,
-  id: JutsuId,
+  id: JutsuEffectId,
 ) {
   ctx.fillStyle = '#18231f'
   ctx.fillRect(0, 0, width, height)

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Sparkles } from 'lucide-vue-next'
+import BrandIcon from '../components/BrandIcon.vue'
 </script>
 <template>
   <div class="page-heading">
@@ -11,7 +12,6 @@ import { Sparkles } from 'lucide-vue-next'
   </div>
   <ClientOnly
     ><PracticeRoom /><template #fallback
-      ><div class="loading-room"><span class="brand-mark">印</span></div></template
-    ></ClientOnly
-  >
+      ><div class="loading-room"><BrandIcon alt="结印修炼场" /></div></template
+  ></ClientOnly>
 </template>

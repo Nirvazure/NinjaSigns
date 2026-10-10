@@ -2,13 +2,13 @@
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { renderEffect } from '../effects/render'
 import { getJutsu } from '../domain/catalog'
-import type { CastEvent, Point } from '../domain/types'
+import type { CastEvent, JutsuEffectId, Point } from '../domain/types'
 
 const emit = defineEmits<{ finished: [] }>()
 const canvas = ref<HTMLCanvasElement | null>(null)
 let observer: ResizeObserver | null = null
 let animation = 0
-let active: CastEvent | null = null
+let active: { effect: JutsuEffectId; duration: number } | null = null
 let started = 0
 let anchor: Point = { x: 0.5, y: 0.55 }
 let reducedMotion = false
@@ -17,8 +17,7 @@ function draw(now: number) {
   if (!active || !canvas.value) return
   const context = canvas.value.getContext('2d')!
   const elapsed = now - started
-  const duration = getJutsu(active.jutsuId).duration
-  if (elapsed >= duration) {
+  if (elapsed >= active.duration) {
     context.clearRect(0, 0, canvas.value.width, canvas.value.height)
     active = null
     emit('finished')
@@ -28,7 +27,7 @@ function draw(now: number) {
     context,
     canvas.value.width,
     canvas.value.height,
-    active.jutsuId,
+    active.effect,
     reducedMotion ? 1.7 : elapsed / 1000,
     anchor,
   )
@@ -36,8 +35,13 @@ function draw(now: number) {
 }
 
 function play(event: CastEvent, position: Point = event.anchor) {
-  cancelAnimationFrame(animation)
-  active = event
+  clear()
+  const jutsu = getJutsu(event.jutsuId)
+  if (!jutsu.effect) {
+    emit('finished')
+    return
+  }
+  active = { effect: jutsu.effect, duration: jutsu.duration }
   anchor = position
   started = performance.now()
   animation = requestAnimationFrame(draw)

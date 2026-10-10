@@ -22,11 +22,21 @@ export default defineNuxtConfig({
       meta: [
         {
           name: 'description',
-          content: '十二结印，三卷忍术。用摄像头练习火影结印，召唤你的伙伴。',
+          content: '从十二基础印开始，用摄像头练习火影忍术，记录修炼进度并召唤你的伙伴。',
         },
         { name: 'theme-color', content: '#eadbb9' },
       ],
-      link: [{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
+      // Keep public icon URLs intact when Vite processes the initial HTML.
+      link: (
+        [
+          { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico?v=scroll' },
+          { rel: 'icon', type: 'image/svg+xml', sizes: 'any', href: '/favicon.svg?v=scroll' },
+          { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' },
+          { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' },
+          { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
+          { rel: 'manifest', href: '/site.webmanifest' },
+        ] as const
+      ).map((link) => ({ ...link, 'vite-ignore': '' })),
     },
   },
 })

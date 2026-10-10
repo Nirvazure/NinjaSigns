@@ -4,6 +4,8 @@ import { computed } from 'vue'
 import { useRoute } from '#imports'
 import { useMastery } from './composables/useMastery'
 import { useNinjaCollection } from './composables/useNinjaCollection'
+import { JUTSUS } from './domain/catalog'
+import BrandIcon from './components/BrandIcon.vue'
 
 const route = useRoute()
 const gallery = computed(() => route.path === '/gallery')
@@ -17,14 +19,16 @@ const { unlockedCount } = useNinjaCollection()
     <header class="dojo-header">
       <div class="header-inner">
         <NuxtLink to="/" class="brand" aria-label="结印修炼场首页">
-          <span class="brand-mark">印</span>
+          <BrandIcon />
           <span class="brand-text">结印修炼场<small>SHINOBI DOJO</small></span>
         </NuxtLink>
         <div class="village-label">木叶隐村<span>忍道 · 从一枚结印开始</span></div>
         <div class="header-collections">
           <NuxtLink to="/gallery" class="collection-summary" aria-label="查看忍术收藏">
             <ScrollText :size="18" /><span
-              >已掌握<strong>{{ count }}<small> / 3</small></strong></span
+              >已掌握<strong
+                >{{ count }}<small> / {{ JUTSUS.length }}</small></strong
+              ></span
             >
           </NuxtLink>
           <NuxtLink
@@ -53,7 +57,7 @@ const { unlockedCount } = useNinjaCollection()
         <span class="future-nav"
           ><Swords :size="18" /><span>双人对战</span><small>筹备中</small></span
         >
-        <span class="nav-note">十二基础印 / 三卷忍术</span>
+        <span class="nav-note">十二基础印 / {{ JUTSUS.length }} 卷忍术</span>
       </nav>
     </div>
     <main id="main" tabindex="-1"><NuxtPage /></main>

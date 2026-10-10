@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from '#imports'
 import {
   Camera,
@@ -29,6 +29,7 @@ import { getNewlyUnlocked, type NinjaDefinition } from '../domain/ninjas'
 import { useNinjaCollection } from '../composables/useNinjaCollection'
 import CompanionPanel from './CompanionPanel.vue'
 import NinjaReward from './NinjaReward.vue'
+import JutsuAttributes from './JutsuAttributes.vue'
 
 const route = useRoute(),
   router = useRouter()
@@ -39,6 +40,7 @@ const selected = computed(() => getJutsu(selectedId.value))
 const video = ref<HTMLVideoElement | null>(null),
   stage = ref<HTMLDivElement | null>(null)
 const effects = ref<InstanceType<typeof EffectCanvas> | null>(null)
+const jutsuOptions = ref<HTMLDivElement | null>(null)
 const step = ref(0),
   casting = ref(false),
   previewing = ref(false),
@@ -48,7 +50,7 @@ const recognized = ref<RecognitionResult | null>(null),
 const feedback = ref('等待结印'),
   wrong = ref(false)
 const { mastery, warning, markMastered } = useMastery()
-const { warning: companionWarning } = useNinjaCollection()
+const { warning: companionWarning, retainedIds } = useNinjaCollection()
 const pendingRewards = ref<NinjaDefinition[]>([])
 const rewards = ref<NinjaDefinition[]>([])
 const { muted, prepare, play } = useCastAudio()
@@ -153,13 +155,15 @@ function onResult(result: RecognitionResult) {
     feedback.value = '结印完成'
     const before = mastery.value
     markMastered(selectedId.value)
-    pendingRewards.value = getNewlyUnlocked(before, mastery.value)
-    effects.value?.play({
-      jutsuId: selectedId.value,
-      anchor: displayedAnchor(result),
-      timestamp: Date.now(),
-    })
+    pendingRewards.value = getNewlyUnlocked(before, mastery.value, retainedIds.value)
     play(selectedId.value)
+    if (selected.value.effect) {
+      effects.value?.play({
+        jutsuId: selectedId.value,
+        anchor: displayedAnchor(result),
+        timestamp: Date.now(),
+      })
+    } else finish()
   }
 }
 
@@ -202,6 +206,7 @@ function stop() {
   reset()
 }
 function preview() {
+  if (!selected.value.effect) return
   reset()
   prepare()
   casting.value = true
@@ -246,6 +251,16 @@ watch(
       mode.value = 'seal'
     } else mode.value = 'jutsu'
     reset()
+    void nextTick(() => {
+      const list = jutsuOptions.value
+      const option = list?.querySelector(`[data-jutsu="${selectedId.value}"]`)
+      if (!list || !option) return
+      const bounds = list.getBoundingClientRect()
+      const selectedBounds = option.getBoundingClientRect()
+      if (selectedBounds.top < bounds.top) list.scrollTop += selectedBounds.top - bounds.top
+      else if (selectedBounds.bottom > bounds.bottom)
+        list.scrollTop += selectedBounds.bottom - bounds.bottom
+    })
   },
   { immediate: true },
 )
@@ -284,12 +299,16 @@ onBeforeUnmount(() => {
             : '卷轴 ' + String(JUTSUS.findIndex((j) => j.id === selectedId) + 1).padStart(2, '0')
         }}</span>
       </div>
-      <div ref="stage" class="camera-stage" :class="{ live: cameraVisible }">
+      <div
+        ref="stage"
+        class="camera-stage"
+        :class="{ live: cameraVisible, placeholder: !selected.effect && !cameraVisible }"
+      >
         <img
           v-if="!cameraVisible && !casting"
           class="stage-poster"
           :src="selected.cover"
-          :alt="selected.shortName + '演出场景'"
+          :alt="selected.shortName + (selected.effect ? '演出场景' : '修炼卷轴')"
         />
         <video
           ref="video"
@@ -318,7 +337,11 @@ onBeforeUnmount(() => {
             </button>
           </div>
         </div>
-        <div v-if="!cameraVisible && !casting" class="stage-caption">
+        <div
+          v-if="!cameraVisible && !casting"
+          class="stage-caption"
+          :data-category-glyph="selected.category[0] || '忍'"
+        >
           <span class="vertical-title">{{
             mode === 'seal' ? nextSeal.name + '之印' : selected.shortName
           }}</span
@@ -379,7 +402,7 @@ onBeforeUnmount(() => {
           </button>
         </div>
         <button
-          v-if="mode === 'jutsu'"
+          v-if="mode === 'jutsu' && selected.effect"
           class="text-button preview-button"
           :disabled="casting"
           @click="preview"
@@ -404,7 +427,12 @@ onBeforeUnmount(() => {
             >{{ Math.min(step, selected.sequence.length) }} / {{ selected.sequence.length }}</span
           >
         </div>
-        <div class="seal-sequence">
+        <div
+          class="seal-sequence"
+          :class="{ long: selected.sequence.length > 6 }"
+          :tabindex="selected.sequence.length > 6 ? 0 : undefined"
+          aria-label="结印顺序"
+        >
           <template v-for="(seal, index) in selected.sequence" :key="`${selectedId}-${index}`"
             ><div
               class="sequence-item"
@@ -449,23 +477,33 @@ onBeforeUnmount(() => {
         <span>修行之卷</span>
       </div>
       <div class="jutsu-selector">
-        <button
-          v-for="(jutsu, index) in JUTSUS"
-          :key="jutsu.id"
-          class="jutsu-option"
-          :class="{ selected: mode === 'jutsu' && selectedId === jutsu.id }"
-          @click="selectJutsu(jutsu.id)"
-        >
-          <span class="jutsu-mini"><img :src="jutsu.cover" :alt="jutsu.shortName" /></span
-          ><span class="jutsu-option-copy"
-            ><strong>{{ jutsu.shortName }}</strong
-            ><span>{{ jutsu.category }} <i>·</i> {{ jutsu.sequence.length }} 枚结印</span></span
-          ><Check v-if="mastery[jutsu.id]" class="mastery-check" :size="16" /><span
-            v-else
-            class="jutsu-index"
-            >{{ String(index + 1).padStart(2, '0') }}</span
+        <div ref="jutsuOptions" class="jutsu-options">
+          <button
+            v-for="(jutsu, index) in JUTSUS"
+            :key="jutsu.id"
+            class="jutsu-option"
+            :data-jutsu="jutsu.id"
+            :data-category="jutsu.category"
+            :class="{ selected: mode === 'jutsu' && selectedId === jutsu.id }"
+            @click="selectJutsu(jutsu.id)"
           >
-        </button>
+            <span class="jutsu-mini" :class="{ placeholder: !jutsu.effect }"
+              ><img :src="jutsu.cover" :alt="jutsu.shortName" /><span
+                v-if="!jutsu.effect"
+                aria-hidden="true"
+                >{{ jutsu.category[0] || '忍' }}</span
+              ></span
+            ><span class="jutsu-option-copy"
+              ><strong>{{ jutsu.shortName }}</strong
+              ><JutsuAttributes :category="jutsu.category" :attack-power="jutsu.attackPower" />
+              <span>{{ jutsu.sequence.length }} 枚结印</span></span
+            ><Check v-if="mastery[jutsu.id]" class="mastery-check" :size="16" /><span
+              v-else
+              class="jutsu-index"
+              >{{ String(index + 1).padStart(2, '0') }}</span
+            >
+          </button>
+        </div>
       </div>
       <div class="seal-instruction">
         <div class="instruction-header">
