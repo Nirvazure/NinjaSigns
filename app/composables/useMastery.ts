@@ -9,11 +9,12 @@ export function useMastery() {
   const warning = useState('mastery-warning', () => '')
   onMounted(() => {
     if (loaded.value) return
-    loaded.value = true
     try {
       mastery.value = parseMastery(localStorage.getItem(PROGRESS_KEY))
     } catch (cause) {
       warning.value = `收藏读取失败：${cause instanceof Error ? cause.message : String(cause)}`
+    } finally {
+      loaded.value = true
     }
   })
   function markMastered(id: JutsuId) {
@@ -30,6 +31,7 @@ export function useMastery() {
   }
   return {
     mastery,
+    loaded,
     warning,
     count: computed(() => Object.keys(mastery.value).length),
     markMastered,

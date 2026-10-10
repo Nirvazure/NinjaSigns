@@ -1585,6 +1585,300 @@ a {
     top: 28%;
   }
 }
+.header-collections {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.ninja-collection-summary {
+  padding-left: 20px;
+  border-left: 1px solid var(--line);
+}
+.collection-summary strong {
+  white-space: nowrap;
+}
+.ninja-gallery-intro {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.ninja-gallery-intro h2 {
+  font: 32px/1.3 var(--display);
+}
+.ninja-gallery-intro > p {
+  font-size: 14px;
+  color: var(--muted);
+}
+.ninja-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 20px;
+}
+.ninja-card {
+  min-width: 0;
+  border: 2px solid var(--line);
+  background: var(--paper-light);
+  box-shadow: var(--surface-shadow);
+}
+.ninja-card.unlocked {
+  border-color: var(--ink);
+}
+.ninja-card.is-companion {
+  border-color: var(--green);
+  box-shadow: 5px 5px 0 var(--green);
+}
+.ninja-portrait {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 244px;
+  padding: 24px 12px 36px;
+  background: #fffdf7;
+  border-bottom: 1px solid var(--line);
+}
+.ninja-portrait img,
+.companion-portrait img,
+.ninja-reward-portraits img {
+  width: 132px;
+  height: 189px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+.ninja-portrait.locked img {
+  filter: grayscale(1) brightness(0.58) contrast(30);
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+}
+.ninja-number {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  font: 9px var(--pixel);
+  color: var(--muted);
+}
+.ninja-status {
+  position: absolute;
+  bottom: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  background: var(--paper-light);
+  color: var(--muted);
+  font-size: 12px;
+}
+.ninja-status.owned {
+  border-color: var(--green);
+  color: var(--green);
+}
+.ninja-card-body {
+  padding: 16px;
+}
+.ninja-card h3 {
+  min-height: 68px;
+  font: 26px/1.3 var(--display);
+  overflow-wrap: anywhere;
+}
+.ninja-condition {
+  min-height: 44px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.ninja-progress-copy {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 12px;
+  font-size: 12px;
+}
+.ninja-card progress {
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 8px;
+  margin: 8px 0 16px;
+  border: 0;
+  background: var(--paper-deep);
+}
+.ninja-card progress::-webkit-progress-bar {
+  background: var(--paper-deep);
+}
+.ninja-card progress::-webkit-progress-value {
+  background: var(--green);
+}
+.ninja-card progress::-moz-progress-bar {
+  background: var(--green);
+}
+.ninja-card button {
+  width: 100%;
+}
+.ninja-card button[aria-pressed='true'] {
+  background: var(--green);
+  color: var(--paper-light);
+}
+.ninja-return {
+  margin-top: 24px;
+}
+.companion-panel {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+}
+.companion-portrait {
+  flex-shrink: 0;
+  padding: 8px;
+  border: 1px solid var(--line);
+  background: #fffdf7;
+}
+.companion-portrait img {
+  width: 66px;
+  height: 94.5px;
+}
+.companion-copy {
+  min-width: 0;
+}
+.companion-copy h2 {
+  font: 26px/1.3 var(--display);
+}
+.companion-copy > p:not(.eyebrow) {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.companion-copy .eyebrow {
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+.ninja-reward {
+  order: 6;
+  padding: 20px;
+  margin-top: 16px;
+  border: 2px solid var(--green);
+  background: var(--paper-light);
+  box-shadow: var(--surface-shadow);
+  animation: companion-arrives 180ms ease-out;
+}
+.ninja-reward-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 12px;
+}
+.ninja-reward h2 {
+  font: 30px/1.3 var(--display);
+  margin-bottom: 8px;
+}
+.ninja-reward-portraits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 16px 0;
+}
+.ninja-reward-portraits > div {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  background: #fffdf7;
+  font-size: 12px;
+}
+.ninja-reward-portraits img {
+  width: 66px;
+  height: 94.5px;
+}
+@keyframes companion-arrives {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (max-width: 1100px) {
+  .ninja-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (min-width: 601px) and (max-width: 900px) {
+  .companion-panel {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+  .learning-column > .section-title {
+    grid-row: 2;
+  }
+  .seal-instruction {
+    grid-row: 3 / 5;
+  }
+  .jutsu-selector {
+    grid-row: 3;
+  }
+  .jutsu-note {
+    grid-row: 4;
+  }
+  .ninja-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .header-collections {
+    gap: 12px;
+  }
+  .ninja-collection-summary {
+    padding-left: 12px;
+  }
+  .ninja-gallery-intro {
+    flex-direction: column;
+    align-items: start;
+    gap: 8px;
+  }
+  .gallery-tabs {
+    flex-wrap: wrap;
+  }
+  .ninja-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .ninja-portrait {
+    height: 218px;
+  }
+  .ninja-portrait img {
+    width: 110px;
+    height: 157.5px;
+  }
+  .ninja-card-body {
+    padding: 12px;
+  }
+  .ninja-card h3 {
+    font-size: 24px;
+  }
+  .ninja-condition {
+    min-height: 63px;
+  }
+  .companion-panel {
+    gap: 16px;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+  }
+  .companion-copy h2 {
+    font-size: 24px;
+  }
+  .ninja-reward {
+    padding: 16px;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

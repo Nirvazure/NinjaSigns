@@ -1,4 +1,4 @@
-const baseUrl = process.argv[2] || 'http://127.0.0.1:3035'
+const baseUrl = process.argv[2] || 'http://127.0.0.1:3000'
 const response = await fetch(new URL('/', baseUrl))
 const body = await response.text()
 
