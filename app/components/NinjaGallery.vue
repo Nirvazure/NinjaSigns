@@ -2,7 +2,8 @@
 import { Check, LockKeyhole, ArrowRight } from 'lucide-vue-next'
 import { useNinjaCollection } from '../composables/useNinjaCollection'
 
-const { entries, ready, unlockedCount, selectedNinja, selectNinja } = useNinjaCollection()
+const { entries, ready, canSelect, unlockedCount, selectedNinja, selectNinja } =
+  useNinjaCollection()
 </script>
 
 <template>
@@ -49,7 +50,7 @@ const { entries, ready, unlockedCount, selectedNinja, selectNinja } = useNinjaCo
           />
           <button
             class="secondary-button"
-            :disabled="!ready || !entry.unlocked"
+            :disabled="!ready || !canSelect || !entry.unlocked"
             :aria-pressed="entry.ninja.id === selectedNinja.id"
             @click="selectNinja(entry.ninja.id)"
           >

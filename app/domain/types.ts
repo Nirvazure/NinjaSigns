@@ -1,5 +1,3 @@
-import type { JUTSU_DATA } from './jutsu-data'
-
 export const SEAL_IDS = [
   'rat',
   'ox',
@@ -15,7 +13,7 @@ export const SEAL_IDS = [
   'boar',
 ] as const
 export type SealId = (typeof SEAL_IDS)[number]
-export type JutsuId = (typeof JUTSU_DATA)[number]['id']
+export type JutsuId = string
 export type JutsuEffectId = 'summoning' | 'fireball' | 'chidori'
 export type Point = { x: number; y: number }
 export type Box = { x: number; y: number; width: number; height: number }

@@ -2209,3 +2209,67 @@ a {
     animation: none;
   }
 }
+/* Account and cloud persistence controls. */
+.account-control {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  min-width: 0;
+  font-size: 13px;
+}
+.account-control img {
+  border-radius: 50%;
+}
+.account-control > span {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.account-control .secondary-button {
+  min-height: 44px;
+  padding: 8px 12px;
+}
+.auth-page {
+  max-width: 720px;
+  margin: 48px auto;
+  padding: 24px;
+  background: var(--paper, #f8edd7);
+  border: 1px solid #b5a68a;
+}
+.auth-page h1 {
+  font-size: clamp(24px, 5vw, 36px);
+}
+.auth-page p {
+  margin: 20px 0;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.auth-page > .quiet-link {
+  display: block;
+  margin-top: 24px;
+}
+.cloud-status {
+  font-size: 13px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.cloud-status p {
+  margin: 12px 0;
+}
+.cloud-status a {
+  margin-left: 8px;
+  text-decoration: underline;
+}
+@media (max-width: 600px) {
+  .header-inner {
+    flex-wrap: wrap;
+  }
+  .account-control {
+    flex-basis: 100%;
+  }
+  .account-control .secondary-button {
+    min-height: 44px;
+  }
+}

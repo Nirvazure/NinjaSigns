@@ -1,22 +1,22 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
 import { useRoute, useRouter, useSeoMeta } from '#imports'
-import { ScrollText, ArrowUpRight, Eye, ArrowRight, X, CircleAlert } from 'lucide-vue-next'
-import { JUTSUS, SEALS } from '../domain/catalog'
+import { ScrollText, ArrowUpRight, Eye, ArrowRight, X } from 'lucide-vue-next'
+import { useCatalog } from '../composables/useCatalog'
 import { useMastery } from '../composables/useMastery'
 import { useCastAudio } from '../composables/useCastAudio'
 import EffectCanvas from '../components/EffectCanvas.vue'
 import type { JutsuDefinition } from '../domain/types'
 import NinjaGallery from '../components/NinjaGallery.vue'
 import JutsuCard from '../components/JutsuCard.vue'
-import { useNinjaCollection } from '../composables/useNinjaCollection'
+import CloudStatus from '../components/CloudStatus.vue'
 
 useSeoMeta({ title: '忍术展览馆 · 结印修炼场' })
 const route = useRoute()
 const router = useRouter()
 const tab = ref<'jutsu' | 'seals' | 'ninjas'>('jutsu')
-const { mastery, count, warning } = useMastery()
-const { warning: companionWarning } = useNinjaCollection()
+const { mastery, count } = useMastery()
+const { JUTSUS, SEALS, NINJAS } = useCatalog()
 const previewJutsu = ref<JutsuDefinition | null>(null)
 const effects = ref<InstanceType<typeof EffectCanvas> | null>(null)
 type Focusable = { focus: () => void }
@@ -109,13 +109,10 @@ function trapDialogFocus(event: { key: string; shiftKey: boolean; preventDefault
     </div>
     <span class="session-label"
       >{{ tabLabel }} ·
-      {{ tab === 'jutsu' ? JUTSUS.length : tab === 'seals' ? SEALS.length : 25 }}</span
+      {{ tab === 'jutsu' ? JUTSUS.length : tab === 'seals' ? SEALS.length : NINJAS.length }}</span
     >
   </div>
-  <p v-if="warning" class="error-message" role="status"><CircleAlert :size="17" />{{ warning }}</p>
-  <p v-if="companionWarning" class="error-message" role="status">
-    <CircleAlert :size="17" />{{ companionWarning }}
-  </p>
+  <CloudStatus />
   <div v-if="tab === 'jutsu'" class="gallery-grid">
     <JutsuCard
       v-for="(jutsu, index) in JUTSUS"
@@ -152,7 +149,7 @@ function trapDialogFocus(event: { key: string; shiftKey: boolean; preventDefault
         ? `${JUTSUS.length} 卷忍术，待你掌握。`
         : tab === 'seals'
           ? '十二枚印，万千变化。'
-          : '二十五位忍者，与你并肩修行。'
+          : `${NINJAS.length} 位忍者，与你并肩修行。`
     }}</span>
   </div>
   <Teleport to="body"

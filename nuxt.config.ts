@@ -10,6 +10,15 @@ export default defineNuxtConfig({
     '~/assets/main.css',
   ],
   ssr: false,
+  modules: ['@nuxtjs/supabase'],
+  alias: { cookie: 'cookie-es' },
+  nitro: { alias: { cookie: 'cookie-es' } },
+  supabase: {
+    redirect: false,
+    cookiePrefix: 'naruto-spiritism-auth',
+    clientOptions: { db: { schema: 'naruto_spiritism' } },
+    types: '~/types/database.types.ts',
+  },
   ignore: ['**/playwright-report/**', '**/test-results/**', '**/docs/validation/**'],
   server: {
     builder:

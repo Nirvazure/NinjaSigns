@@ -18,22 +18,23 @@ import {
   Eye,
 } from 'lucide-vue-next'
 import EffectCanvas from './EffectCanvas.vue'
-import { JUTSUS, SEALS, getJutsu, getSeal } from '../domain/catalog'
+import { useCatalog } from '../composables/useCatalog'
 import { SealStabilizer, SequenceMatcher } from '../domain/practice'
 import { mirrorPoint } from '../recognition/yolox'
 import { useCameraRecognition } from '../composables/useCameraRecognition'
 import { useMastery } from '../composables/useMastery'
 import { useCastAudio } from '../composables/useCastAudio'
 import type { JutsuId, SealId, RecognitionResult, Point } from '../domain/types'
-import { getNewlyUnlocked, type NinjaDefinition } from '../domain/ninjas'
-import { useNinjaCollection } from '../composables/useNinjaCollection'
+import type { NinjaDefinition } from '../domain/ninjas'
+import CloudStatus from './CloudStatus.vue'
 import CompanionPanel from './CompanionPanel.vue'
 import NinjaReward from './NinjaReward.vue'
 import JutsuAttributes from './JutsuAttributes.vue'
 
 const route = useRoute(),
   router = useRouter()
-const selectedId = ref<JutsuId>('summoning')
+const { JUTSUS, SEALS, NINJAS, getJutsu, getSeal, player } = useCatalog()
+const selectedId = ref<JutsuId>(JUTSUS.value[0]!.id)
 const selectedSeal = ref<SealId>('boar')
 const mode = ref<'jutsu' | 'seal'>('jutsu')
 const selected = computed(() => getJutsu(selectedId.value))
@@ -49,8 +50,7 @@ const recognized = ref<RecognitionResult | null>(null),
   hold = ref(0)
 const feedback = ref('等待结印'),
   wrong = ref(false)
-const { mastery, warning, markMastered } = useMastery()
-const { warning: companionWarning, retainedIds } = useNinjaCollection()
+const { mastery, markMastered } = useMastery()
 const pendingRewards = ref<NinjaDefinition[]>([])
 const rewards = ref<NinjaDefinition[]>([])
 const { muted, prepare, play } = useCastAudio()
@@ -93,6 +93,13 @@ function revealRewards() {
   )
   rewards.value = [...merged.values()]
   pendingRewards.value = []
+}
+function queueRewards(ids: string[]) {
+  const added = NINJAS.value.filter((ninja) => ids.includes(ninja.id))
+  pendingRewards.value = [
+    ...new Map([...pendingRewards.value, ...added].map((ninja) => [ninja.id, ninja])).values(),
+  ]
+  if (!casting.value || previewing.value) revealRewards()
 }
 
 function displayedAnchor(result: RecognitionResult): Point {
@@ -153,9 +160,7 @@ function onResult(result: RecognitionResult) {
     casting.value = true
     previewing.value = false
     feedback.value = '结印完成'
-    const before = mastery.value
-    markMastered(selectedId.value)
-    pendingRewards.value = getNewlyUnlocked(before, mastery.value, retainedIds.value)
+    void markMastered(selectedId.value).then(queueRewards)
     play(selectedId.value)
     if (selected.value.effect) {
       effects.value?.play({
@@ -168,6 +173,16 @@ function onResult(result: RecognitionResult) {
 }
 
 const camera = useCameraRecognition(video, onResult)
+watch(
+  () => player.epoch,
+  () => {
+    rewards.value = []
+    pendingRewards.value = []
+    camera.pause()
+    reset()
+  },
+  { flush: 'sync' },
+)
 const { status, error, fps } = camera
 const statusLabel = computed(
   () =>
@@ -243,8 +258,8 @@ function fullscreen() {
 watch(
   () => route.query,
   () => {
-    const jutsu = JUTSUS.find((entry) => entry.id === route.query.jutsu),
-      seal = SEALS.find((entry) => entry.id === route.query.seal)
+    const jutsu = JUTSUS.value.find((entry) => entry.id === route.query.jutsu),
+      seal = SEALS.value.find((entry) => entry.id === route.query.seal)
     if (jutsu) selectedId.value = jutsu.id
     if (seal) {
       selectedSeal.value = seal.id
@@ -413,12 +428,7 @@ onBeforeUnmount(() => {
       <div v-if="error" class="error-message" role="alert">
         <CircleAlert :size="17" /><span>{{ error }}</span>
       </div>
-      <div v-if="warning" class="error-message" role="status">
-        <CircleAlert :size="17" /><span>{{ warning }}</span>
-      </div>
-      <div v-if="companionWarning" class="error-message" role="status">
-        <CircleAlert :size="17" /><span>{{ companionWarning }}</span>
-      </div>
+      <CloudStatus @rewards="queueRewards" />
       <NinjaReward :ninjas="rewards" @dismiss="rewards = []" />
       <div v-if="mode === 'jutsu'" class="sequence-section">
         <div class="section-title">

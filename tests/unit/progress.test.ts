@@ -1,58 +1,48 @@
 import { describe, expect, it } from 'vitest'
-import { parseMastery } from '../../app/domain/progress'
-
-describe('local mastery records', () => {
-  it('loads a valid real-cast record', () => {
+import { parsePlayerState } from '../../app/domain/cloud-state'
+import { parseCatalog } from '../../app/domain/catalog'
+import { JUTSUS, SEALS } from '../../supabase/seed/catalog'
+import { NINJAS } from '../../supabase/seed/ninjas'
+const catalog = parseCatalog({ seals: SEALS, jutsus: JUTSUS, ninjas: NINJAS })
+const base = {
+  userId: 'a',
+  version: 1,
+  displayName: '忍者',
+  avatarUrl: null,
+  companionId: 'ninja-01',
+  unlockedIds: ['ninja-01'],
+  mastery: {},
+}
+describe('private cloud state validation', () => {
+  it('loads verified progress without reading local records', () => {
     expect(
-      parseMastery('{"chidori":{"casts":2,"lastCastAt":"2026-10-09T01:00:00Z"}}').chidori?.casts,
+      parsePlayerState(
+        { ...base, mastery: { fireball: { casts: 2, lastCastAt: '2026-10-12T00:00:00Z' } } },
+        catalog,
+      ).mastery.fireball?.casts,
     ).toBe(2)
   })
-  it('loads a newly added jutsu without requiring a storage migration', () => {
-    expect(
-      parseMastery('{"great-fire-annihilation":{"casts":1,"lastCastAt":"2026-10-10T01:00:00Z"}}'),
-    ).toEqual({
-      'great-fire-annihilation': { casts: 1, lastCastAt: '2026-10-10T01:00:00Z' },
-    })
-  })
-  it('restores an expanded multi-seal jutsu alongside existing progress', () => {
-    expect(
-      parseMastery(
-        '{"shuriken-shadow-clone":{"casts":3,"lastCastAt":"2026-10-10T02:00:00Z"},"fireball":{"casts":1,"lastCastAt":"2026-10-09T01:00:00Z"}}',
+  it.each([0, -1, 1.5, Number.MAX_SAFE_INTEGER + 1])('rejects invalid cast count %s', (casts) => {
+    expect(() =>
+      parsePlayerState(
+        { ...base, mastery: { fireball: { casts, lastCastAt: '2026-10-12T00:00:00Z' } } },
+        catalog,
       ),
-    ).toEqual({
-      'shuriken-shadow-clone': { casts: 3, lastCastAt: '2026-10-10T02:00:00Z' },
-      fireball: { casts: 1, lastCastAt: '2026-10-09T01:00:00Z' },
-    })
+    ).toThrow()
   })
-  it('rejects a corrupted record', () => {
-    expect(() => parseMastery('{"chidori":{"casts":-1}}')).toThrow('收藏记录内容无效')
-  })
-  it('starts empty without a saved record', () => {
-    expect(parseMastery(null)).toEqual({})
-  })
-
-  it('ignores unknown ids, including malformed unknown records', () => {
-    expect(
-      parseMastery(
-        '{"unknown-jutsu":false,"chidori":{"casts":2,"lastCastAt":"2026-10-09T01:00:00Z"}}',
+  it('rejects invalid dates, unknown jutsu and unowned companions', () => {
+    expect(() =>
+      parsePlayerState(
+        { ...base, mastery: { fireball: { casts: 1, lastCastAt: 'invalid' } } },
+        catalog,
       ),
-    ).toEqual({ chidori: { casts: 2, lastCastAt: '2026-10-09T01:00:00Z' } })
-  })
-
-  it.each([
-    null,
-    false,
-    0,
-    [],
-    { casts: 0, lastCastAt: '2026-10-09T01:00:00Z' },
-    { casts: 1.5, lastCastAt: '2026-10-09T01:00:00Z' },
-    { casts: 1, lastCastAt: 'not-a-date' },
-    { casts: Number.MAX_SAFE_INTEGER + 1, lastCastAt: '2026-10-09T01:00:00Z' },
-  ])('rejects malformed known records: %j', (record) => {
-    expect(() => parseMastery(JSON.stringify({ summoning: record }))).toThrow('收藏记录内容无效')
-  })
-
-  it.each(['null', '[]', 'false', '3', '"text"'])('rejects malformed containers: %s', (raw) => {
-    expect(() => parseMastery(raw)).toThrow('收藏记录格式无效')
+    ).toThrow()
+    expect(() =>
+      parsePlayerState(
+        { ...base, mastery: { unknown: { casts: 1, lastCastAt: '2026-10-12T00:00:00Z' } } },
+        catalog,
+      ),
+    ).toThrow()
+    expect(() => parsePlayerState({ ...base, companionId: 'ninja-02' }, catalog)).toThrow()
   })
 })

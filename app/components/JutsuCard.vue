@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { Check, ScrollText, Hand, ArrowUpRight, Eye } from 'lucide-vue-next'
-import { getSeal } from '../domain/catalog'
+import { useCatalog } from '../composables/useCatalog'
 import type { JutsuDefinition } from '../domain/types'
 import JutsuAttributes from './JutsuAttributes.vue'
 
 defineProps<{ jutsu: JutsuDefinition; index: number; mastered: boolean }>()
 defineEmits<{ preview: [jutsu: JutsuDefinition] }>()
+const { getSeal } = useCatalog()
 </script>
 
 <template>
