@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { SealStabilizer, SequenceMatcher } from '../../app/domain/practice'
-import { JUTSUS } from '../../app/domain/catalog'
+import { JUTSUS } from '../../supabase/seed/catalog'
 
 describe('stable seal confirmation', () => {
   it('requires a continuous 300ms confident hold', () => {

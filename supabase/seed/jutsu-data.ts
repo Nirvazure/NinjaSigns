@@ -1,4 +1,4 @@
-import type { JutsuBusinessData } from './types'
+import type { JutsuBusinessData } from '../../app/domain/types'
 
 export const JUTSU_DATA = [
   {

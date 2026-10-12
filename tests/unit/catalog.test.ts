@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { JUTSU_IDS, JUTSUS, getJutsu, withJutsuPresentation } from '../../app/domain/catalog'
+import { JUTSU_IDS, JUTSUS, getJutsu, withJutsuPresentation } from '../../supabase/seed/catalog'
 import { SEAL_IDS } from '../../app/domain/types'
 
 describe('catalog sequences', () => {

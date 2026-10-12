@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { renderEffect } from '../effects/render'
-import { getJutsu } from '../domain/catalog'
+import { useCatalog } from '../composables/useCatalog'
 import type { CastEvent, JutsuEffectId, Point } from '../domain/types'
 
 const emit = defineEmits<{ finished: [] }>()
+const { getJutsu } = useCatalog()
 const canvas = ref<HTMLCanvasElement | null>(null)
 let observer: ResizeObserver | null = null
 let animation = 0

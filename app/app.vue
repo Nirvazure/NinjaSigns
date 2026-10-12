@@ -4,13 +4,16 @@ import { computed } from 'vue'
 import { useRoute } from '#imports'
 import { useMastery } from './composables/useMastery'
 import { useNinjaCollection } from './composables/useNinjaCollection'
-import { JUTSUS } from './domain/catalog'
+import { useCatalog } from './composables/useCatalog'
+import AccountControl from './components/AccountControl.vue'
 import BrandIcon from './components/BrandIcon.vue'
 
 const route = useRoute()
 const gallery = computed(() => route.path === '/gallery')
 const { count } = useMastery()
 const { unlockedCount } = useNinjaCollection()
+const { JUTSUS, NINJAS, catalog, catalogLoading, catalogError, loadCatalog } = useCatalog()
+const authPage = computed(() => route.path === '/login' || route.path === '/auth/callback')
 </script>
 
 <template>
@@ -37,10 +40,13 @@ const { unlockedCount } = useNinjaCollection()
             aria-label="查看忍者收藏"
           >
             <span
-              >忍者<strong>{{ unlockedCount }}<small> / 25</small></strong></span
+              >忍者<strong
+                >{{ unlockedCount }}<small> / {{ NINJAS.length }}</small></strong
+              ></span
             >
           </NuxtLink>
         </div>
+        <AccountControl />
       </div>
     </header>
     <div class="navigation-wrap">
@@ -60,7 +66,16 @@ const { unlockedCount } = useNinjaCollection()
         <span class="nav-note">十二基础印 / {{ JUTSUS.length }} 卷忍术</span>
       </nav>
     </div>
-    <main id="main" tabindex="-1"><NuxtPage /></main>
+    <main id="main" tabindex="-1">
+      <NuxtPage v-if="catalog || authPage" />
+      <section v-else class="auth-page" aria-live="polite">
+        <h1>{{ catalogLoading ? '正在读取修炼目录…' : '修炼目录暂时不可用' }}</h1>
+        <p v-if="catalogError" role="alert">{{ catalogError }}</p>
+        <button v-if="!catalogLoading" class="primary-button" @click="loadCatalog">
+          重新读取目录
+        </button>
+      </section>
+    </main>
     <footer class="app-footer">
       <span>结印修炼场 · 非官方同人作品</span>
       <a

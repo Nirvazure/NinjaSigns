@@ -1,6 +1,7 @@
-import { test, expect, type Page } from '@playwright/test'
-import { JUTSUS } from '../../app/domain/catalog'
-import type { SealId } from '../../app/domain/types'
+import { replayCamera, setReplaySeal } from './replay'
+import { test, expect } from './fixtures'
+import type { Page } from '@playwright/test'
+import { JUTSUS } from '../../supabase/seed/catalog'
 
 const cameraReadyTimeout = 30_000
 const animatedJutsus = JUTSUS.filter((jutsu) => jutsu.effect)
@@ -123,55 +124,11 @@ test('a model download failure prevents camera activation', async ({ page }) => 
   await expect(page.getByRole('alert')).toContainText('启动失败')
 })
 
-async function replayCamera(page: Page) {
-  await page.addInitScript(() => {
-    const canvas = document.createElement('canvas')
-    canvas.width = 1200
-    canvas.height = 784
-    const context = canvas.getContext('2d')!
-    let current: HTMLImageElement | null = null
-    function draw() {
-      context.fillStyle = '#343a37'
-      context.fillRect(0, 0, canvas.width, canvas.height)
-      if (current) context.drawImage(current, 0, 0, canvas.width, canvas.height)
-    }
-    Object.assign(window, {
-      __replaySeal: async (id: string | null) => {
-        if (!id) {
-          current = null
-          draw()
-          return
-        }
-        const image = new Image()
-        image.src = `/images/seals/${id}.jpg`
-        await image.decode()
-        current = image
-        draw()
-      },
-      __replayTrack: null,
-    })
-    navigator.mediaDevices.getUserMedia = async () => {
-      draw()
-      const stream = canvas.captureStream(12)
-      Object.assign(window, { __replayTrack: stream.getVideoTracks()[0] })
-      const timer = setInterval(draw, 80)
-      stream.getVideoTracks()[0]!.addEventListener('ended', () => clearInterval(timer))
-      return stream
-    }
-  })
-}
-
-async function setReplaySeal(page: Page, id: SealId | null) {
-  await page.evaluate(async (id) => {
-    await (
-      window as unknown as { __replaySeal: (id: string | null) => Promise<void> }
-    ).__replaySeal(id)
-  }, id)
-}
-
 test('reference video replay traverses the real model and casts all three jutsu', async ({
   page,
+  backend,
 }) => {
+  await backend.signIn()
   await replayCamera(page)
   await page.goto('/')
   await page.getByRole('button', { name: '开启摄像头', exact: true }).click()
@@ -232,20 +189,12 @@ test('single-seal replay does not grant a jutsu mastery record', async ({ page }
 for (const jutsu of replayPracticeOnlyJutsus) {
   test(`${jutsu.shortName} completes through real recognition, waits for release, and survives reload`, async ({
     page,
+    backend,
   }) => {
     test.setTimeout(120000)
     await replayCamera(page)
-    await page.addInitScript(() => {
-      if (!localStorage.getItem('naruto-spiritism.progress.v1'))
-        localStorage.setItem(
-          'naruto-spiritism.progress.v1',
-          JSON.stringify({
-            fireball: { casts: 2, lastCastAt: '2026-10-10T01:00:00Z' },
-            'body-replacement': { casts: 1, lastCastAt: '2026-10-10T01:00:00Z' },
-            'water-bullet': { casts: 1, lastCastAt: '2026-10-10T01:00:00Z' },
-          }),
-        )
-    })
+    await backend.seed(['fireball', 'body-replacement', 'water-bullet'])
+    await backend.signIn()
     await page.goto(`/?jutsu=${jutsu.id}`)
     await expect(page.getByRole('button', { name: '效果预览', exact: true })).toHaveCount(0)
     await page.getByRole('button', { name: '开启摄像头', exact: true }).click()
@@ -272,24 +221,14 @@ for (const jutsu of replayPracticeOnlyJutsus) {
       `0 / ${jutsu.sequence.length}`,
     )
     await page.waitForTimeout(1100)
-    expect(
-      await page.evaluate(
-        (id) => JSON.parse(localStorage.getItem('naruto-spiritism.progress.v1')!)[id].casts,
-        jutsu.id,
-      ),
-    ).toBe(1)
+    expect((await backend.state()).mastery[jutsu.id]!.casts).toBe(1)
     await setReplaySeal(page, null)
     await expect(page.locator('.recognition-strip')).toContainText('等待下一轮结印')
     await setReplaySeal(page, jutsu.sequence[0]!)
     if (jutsu.sequence.length === 1) {
       await expect(page.locator('.recognition-strip')).toContainText('施术成功 · 松手后继续')
       await expect
-        .poll(() =>
-          page.evaluate(
-            (id) => JSON.parse(localStorage.getItem('naruto-spiritism.progress.v1')!)[id].casts,
-            jutsu.id,
-          ),
-        )
+        .poll(() => backend.state().then((state) => state.mastery[jutsu.id]!.casts))
         .toBe(2)
     } else {
       await expect(page.locator('.sequence-section .section-title>span')).toHaveText(
@@ -304,12 +243,9 @@ for (const jutsu of replayPracticeOnlyJutsus) {
     ).toHaveCount(0)
     await page.reload()
     await expect(card.locator('.mastery-badge')).toHaveText('已掌握')
-    expect(
-      await page.evaluate(
-        (id) => JSON.parse(localStorage.getItem('naruto-spiritism.progress.v1')!)[id].casts,
-        jutsu.id,
-      ),
-    ).toBe(jutsu.sequence.length === 1 ? 2 : 1)
+    expect((await backend.state()).mastery[jutsu.id]!.casts).toBe(
+      jutsu.sequence.length === 1 ? 2 : 1,
+    )
   })
 }
 
@@ -366,18 +302,12 @@ test('practice-only scrolls show readable covers and fit the page at desktop and
 
 test('real replay grants merged rewards only after the effect and never repeats them', async ({
   page,
+  backend,
 }) => {
   test.setTimeout(120000)
   await replayCamera(page)
-  await page.addInitScript(() => {
-    localStorage.setItem(
-      'naruto-spiritism.progress.v1',
-      JSON.stringify({
-        'false-darkness': { casts: 1, lastCastAt: '2026-10-10T01:00:00Z' },
-        'black-panther': { casts: 1, lastCastAt: '2026-10-10T01:00:00Z' },
-      }),
-    )
-  })
+  await backend.seed(['false-darkness', 'black-panther'])
+  await backend.signIn()
   await page.goto('/?jutsu=chidori')
   await expect(page.getByRole('link', { name: '查看忍者收藏' })).toContainText('1')
   await expect(page.locator('.ninja-reward')).toHaveCount(0)
@@ -417,18 +347,10 @@ test('real replay grants merged rewards only after the effect and never repeats 
     await setReplaySeal(page, null)
     await expect(page.locator('.recognition-strip')).toContainText('等待下一轮结印')
   }
-  expect(
-    await page.evaluate(
-      () => JSON.parse(localStorage.getItem('naruto-spiritism.progress.v1')!).chidori.casts,
-    ),
-  ).toBe(2)
+  expect((await backend.state()).mastery.chidori!.casts).toBe(2)
   await page.getByRole('button', { name: '效果预览', exact: true }).click()
   await expect(page.locator('.cast-title')).toContainText('忍术预览')
   await expect(page.locator('.cast-title')).toHaveCount(0)
   await expect(page.locator('.ninja-reward')).toHaveCount(0)
-  expect(
-    await page.evaluate(
-      () => JSON.parse(localStorage.getItem('naruto-spiritism.progress.v1')!).chidori.casts,
-    ),
-  ).toBe(2)
+  expect((await backend.state()).mastery.chidori!.casts).toBe(2)
 })

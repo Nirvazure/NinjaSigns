@@ -1,12 +1,12 @@
 # 火影结印 Web MVP
 
-这是一个本地优先的 Nuxt 4 / Vue 3 结印修炼场：摄像头画面在浏览器 Worker 内由 YOLOX-Nano 识别，不上传视频。首页提供 28 种忍术的逐步结印练习和单印练习；通灵之术、豪火球之术、千鸟保留 Canvas 2D 演出，其余 25 种在结印完成后直接记录掌握进度。展览馆展示十二基础印、完整忍术目录、招式顺序和本机掌握进度。
+这是一个 Nuxt 4 / Vue 3 结印修炼场：摄像头画面在浏览器 Worker 内由 YOLOX-Nano 识别，不上传视频。公共目录和账号记录存于 YQYHub Supabase 的独立 `naruto_spiritism` schema，与 Artmind、RapperRank 共用 GitHub Auth 身份。首页提供 28 种忍术的逐步结印练习和单印练习；通灵之术、豪火球之术、千鸟保留 Canvas 2D 演出。
 
 展览馆的“忍者图鉴”收录 25 位像素忍者，初始伙伴为鸣人。真实施放豪火球、千鸟、通灵之术后分别解锁佐助、卡卡西、波风水门；其余伙伴主要通过掌握指定忍术或忍术组合解锁，少量条件为掌握不同种类的忍术；重复施术不再推进解锁。图鉴显示每位忍者的解锁条件和进度，已解锁人物可设为修炼伙伴。有演出的忍术在演出结束后展示本次新解锁人物，其余忍术结印完成后立即展示；效果预览和单印练习不计奖励。
 
-忍术进度沿用 `naruto-spiritism.progress.v1`，伙伴选择单独保存在 `naruto-spiritism.companion.v1`。记录仅保存在当前浏览器；首次升级将旧规则已经解锁的伙伴保存到 `naruto-spiritism.ninja-unlocks.v1`，后续按新规则解锁。直接访问 `/gallery?tab=ninjas` 可打开忍者图鉴。
+游客可浏览、预览和练习，不保存进度、不解锁忍者或保存伙伴选择。登录账号首次访问时从零掌握、初始鸣人开始，进度、收藏和伙伴可跨设备恢复。施术保存失败可在当前页面重试，重复请求只计一次；本期没有持久离线队列。新版启动只清理三个旧业务 localStorage 键，不导入或备份旧记录。直接访问 `/gallery?tab=ninjas` 可打开忍者图鉴。
 
-本地忍术数据 `app/domain/jutsu-data.ts` 为全部 28 个忍术提供 `attackPower`，初始范围为 0–100，0 表示辅助忍术无直接伤害。这是可调整的游戏平衡初值，后续对战可直接读取。
+运行时目录通过数据库 RPC 读取；`supabase/seed` 只用于初始迁移和测试。`attackPower` 范围为 0–100，0 表示辅助忍术无直接伤害。十二印的识别类别映射固定在模型适配代码中，不随目录展示顺序变化。
 
 ## 字体许可
 
@@ -16,6 +16,7 @@
 
 ```bash
 yarn install
+cp .env.example .env  # 填入 YQYHub 的公开 Key
 yarn dev
 ```
 
@@ -24,13 +25,15 @@ yarn dev
 ## 常用检查
 
 ```bash
-yarn test             # 稳定确认、序列匹配和掌握记录
+yarn test             # 识别、序列匹配、账号状态和隔离 PostgreSQL 集成测试
 yarn test:e2e         # Edge：响应式、权限异常、展览馆和真实模型回放
 yarn typecheck
 yarn lint
 yarn format:check
 yarn build
 ```
+
+数据库迁移、权限核验与 OAuth 回调配置见 [Supabase 接入说明](docs/supabase.md)。应用运行只需公开 URL 与 Key；数据库连接串和管理 Token 只供本地管理脚本使用。
 
 `yarn build` 使用 Nitro 生成生产包；开发环境使用 Vite SPA server，避免 Nuxt 开发 renderer 在无 SSR 页面上读取不存在的 manifest。生产预览可运行 `yarn preview`。
 
