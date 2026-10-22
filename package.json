@@ -18,12 +18,9 @@
     "validate:model": "node scripts/validate-model.mjs",
     "assets:sync": "node scripts/sync-assets.mjs",
     "db:generate": "node --import tsx scripts/db-generate.ts",
-    "db:migrate": "node --env-file=.env --import tsx scripts/db-migrate.ts",
     "db:status": "node --env-file=.env --import tsx scripts/db-status.ts",
-    "db:expose": "node --env-file=.env --import tsx scripts/db-expose.ts",
     "auth:configure": "node --env-file=.env --import tsx scripts/auth-configure.ts",
-    "db:verify": "node --env-file=.env --import tsx scripts/db-verify.ts",
-    "db:verify-transactions": "node --env-file=.env --import tsx scripts/db-verify-transactions.ts"
+    "db:verify": "node --env-file=.env --import tsx scripts/db-verify.ts"
   },
   "dependencies": {
     "@fontsource/ma-shan-zheng": "^5.3.1",
@@ -42,11 +39,9 @@
     "@electric-sql/pglite": "^0.5.8",
     "@eslint/js": "^9.39.0",
     "@playwright/test": "^1.58.2",
-    "@types/pg": "^8.23.1",
     "eslint": "^9.39.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-vue": "^10.8.0",
-    "pg": "^8.23.1",
     "prettier": "^3.8.1",
     "tsx": "^4.23.15",
     "typescript": "^5.9.3",

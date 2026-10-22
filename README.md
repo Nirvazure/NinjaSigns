@@ -33,7 +33,7 @@ yarn format:check
 yarn build
 ```
 
-数据库迁移、权限核验与 OAuth 回调配置见 [Supabase 接入说明](docs/supabase.md)。应用运行只需公开 URL 与 Key；数据库连接串和管理 Token 只供本地管理脚本使用。
+应用运行只需 `SUPABASE_URL` 与 `SUPABASE_PUBLISHABLE_KEY`，无需数据库连接串或 Secret Key。`yarn db:status` 检查公开 Auth/目录 API，`yarn db:verify` 核对种子目录及游客 RPC 拒绝访问；两者不审计数据库内部权限。数据库维护改用 [Supabase 控制台维护](docs/database-console.md)。可选 OAuth 回调管理工具仍使用独立管理 Token，见 [Supabase 接入说明](docs/supabase.md)。
 
 `yarn build` 使用 Nitro 生成生产包；开发环境使用 Vite SPA server，避免 Nuxt 开发 renderer 在无 SSR 页面上读取不存在的 manifest。生产预览可运行 `yarn preview`。
 
