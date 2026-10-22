@@ -8,20 +8,17 @@
 
 Vercel 中关联同名 Shared 变量，并选择所需的 Production、Preview、Development 环境。删除项目原有的 `NUXT_PUBLIC_SUPABASE_URL`、`NUXT_PUBLIC_SUPABASE_KEY` 和 `SUPABASE_KEY`，避免旧配置被模块优先读取；如有项目级同名变量，也应移除以免覆盖 Shared。关联和清理完成后重新部署。普通本地 Nuxt 开发仍从 `.env` 读取配置，不会自动同步 Vercel Shared。
 
-管理脚本也统一读取这两个变量。公开 API 请求只在 `apikey` 请求头传入 Publishable Key；它不是用户 JWT，不作为 `Authorization: Bearer` 令牌。
+公开 API 检查也统一读取这两个变量。公开 API 请求只在 `apikey` 请求头传入 Publishable Key；它不是用户 JWT，不作为 `Authorization: Bearer` 令牌。
 
-管理脚本额外使用 `DIRECT_DATABASE_URL`：YQYHub Session Pooler 的 5432 连接串。此环境不支持直连 IPv6，因此使用 `aws-1-ap-southeast-1.pooler.supabase.com:5432`。脚本自动下载并缓存 Supabase 官方数据库 CA，校验 SHA-256 指纹，使用 `verify-full` 验证证书和主机名；可通过 `SUPABASE_DB_CA_PATH` 指向同一官方 CA 的本地文件。
+项目已移除数据库直连、证书下载和云端 SQL 管理脚本。数据库维护使用 [控制台维护手册](database-console.md)。本地与 Vercel 均无需数据库连接或 CA 配置。当前没有服务端高权限业务，不配置 Secret Key。
 
 ```bash
-yarn db:migrate             # 按顺序应用 SQL，一次事务，记录名称与校验和
-yarn db:expose              # 在已有 Data API schema 列表末尾追加本应用并通知重载
-yarn db:status              # 核验 GitHub Provider、目录 API 和 schema 配置
-yarn db:verify              # 核验真实目录、游客 RPC、RLS 和表/函数权限
-yarn db:verify-transactions # 真实账号及并发锁的回滚事务验证，不留测试记录
+yarn db:status              # 公开 Auth/GitHub Provider 和有效目录检查
+yarn db:verify              # 精确核对种子目录和游客 RPC 拒绝访问
 yarn db:generate            # 在独立 PGlite 数据库应用全部迁移，只生成本 schema 类型
 ```
 
-`db:migrate` 和 `db:expose` 为不同操作：前者只修改本应用 schema，后者更新项目级 Data API 配置并保留所有原有 schema。已应用迁移不得编辑；后续目录或结构变更应新增 SQL 文件。类型生成器不会重写迁移历史。
+已应用迁移不得编辑或重复执行；后续变更新增 SQL 文件，在控制台执行并记录 checksum。类型生成与本地测试继续使用隔离 PGlite。原云端双连接并发及真实用户回滚测试工具已移除；本地测试、公开 API 检查和控制台只读核验不能替代真实云端并发验证。
 
 ## GitHub 回调
 
@@ -52,7 +49,7 @@ yarn auth:configure
 
 旧存储只删除 `naruto-spiritism.progress.v1`、`naruto-spiritism.companion.v1`、`naruto-spiritism.ninja-unlocks.v1`。存储不可访问不阻挡启动，旧内容不读取、不迁移、不备份。
 
-## 2026-10-12 实施状态
+## 2026-10-12 历史实施状态（非本次重新验收）
 
 - YQYHub 已应用 `202610120001_schema.sql` 与 `202610120002_catalog.sql`。
 - Data API 已暴露 `naruto_spiritism`，原有 public、graphql_public、storage、rapperank、artmind 保留。
