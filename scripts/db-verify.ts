@@ -4,12 +4,11 @@ import { parseCatalog } from '../app/domain/catalog'
 import { SEALS, JUTSUS } from '../supabase/seed/catalog'
 import { NINJAS } from '../supabase/seed/ninjas'
 
-const apiUrl = process.env.NUXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
-const key = process.env.NUXT_PUBLIC_SUPABASE_KEY || process.env.SUPABASE_KEY || ''
-if (!apiUrl || !key) throw Error('Supabase URL and public Key are required.')
+const apiUrl = process.env.SUPABASE_URL
+const key = process.env.SUPABASE_PUBLISHABLE_KEY
+if (!apiUrl || !key) throw Error('SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY are required.')
 const headers = {
   apikey: key,
-  Authorization: `Bearer ${key}`,
   'Content-Profile': 'naruto_spiritism',
   'Content-Type': 'application/json',
 }

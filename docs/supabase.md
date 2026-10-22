@@ -4,7 +4,11 @@
 
 ## 配置与命令
 
-复制 `.env.example` 为 `.env`。应用运行只需要 `NUXT_PUBLIC_SUPABASE_URL` 和公开 `NUXT_PUBLIC_SUPABASE_KEY`。也支持参考应用的 `SUPABASE_URL` / `SUPABASE_KEY` 名称。禁止把数据库密码、Access Token 或 service-role Key 放入公开变量。
+复制 `.env.example` 为 `.env`。应用运行只需要 `SUPABASE_URL` 和公开的 `SUPABASE_PUBLISHABLE_KEY`，与其他应用及 Vercel Shared 变量保持同名。`@nuxtjs/supabase` 会读取这两个变量并传入 Nuxt 的公开运行配置，供浏览器登录和调用 Data API。禁止把数据库密码、Access Token、Secret Key 或 service-role Key 放入公开配置。
+
+Vercel 中关联同名 Shared 变量，并选择所需的 Production、Preview、Development 环境。删除项目原有的 `NUXT_PUBLIC_SUPABASE_URL`、`NUXT_PUBLIC_SUPABASE_KEY` 和 `SUPABASE_KEY`，避免旧配置被模块优先读取；如有项目级同名变量，也应移除以免覆盖 Shared。关联和清理完成后重新部署。普通本地 Nuxt 开发仍从 `.env` 读取配置，不会自动同步 Vercel Shared。
+
+管理脚本也统一读取这两个变量。公开 API 请求只在 `apikey` 请求头传入 Publishable Key；它不是用户 JWT，不作为 `Authorization: Bearer` 令牌。
 
 管理脚本额外使用 `DIRECT_DATABASE_URL`：YQYHub Session Pooler 的 5432 连接串。此环境不支持直连 IPv6，因此使用 `aws-1-ap-southeast-1.pooler.supabase.com:5432`。脚本自动下载并缓存 Supabase 官方数据库 CA，校验 SHA-256 指纹，使用 `verify-full` 验证证书和主机名；可通过 `SUPABASE_DB_CA_PATH` 指向同一官方 CA 的本地文件。
 
