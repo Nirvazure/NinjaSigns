@@ -33,10 +33,8 @@ import JutsuAttributes from './JutsuAttributes.vue'
 
 const route = useRoute(),
   router = useRouter()
-const { JUTSUS, SEALS, NINJAS, getJutsu, getSeal, player } = useCatalog()
+const { JUTSUS, NINJAS, getJutsu, getSeal, player } = useCatalog()
 const selectedId = ref<JutsuId>(JUTSUS.value[0]!.id)
-const selectedSeal = ref<SealId>('boar')
-const mode = ref<'jutsu' | 'seal'>('jutsu')
 const selected = computed(() => getJutsu(selectedId.value))
 const video = ref<HTMLVideoElement | null>(null),
   stage = ref<HTMLDivElement | null>(null)
@@ -61,11 +59,7 @@ let candidate: SealId | null = null,
   neutralSince: number | null = null
 let timer: ReturnType<typeof setInterval> | null = null
 const nextSeal = computed(() =>
-  getSeal(
-    mode.value === 'seal'
-      ? selectedSeal.value
-      : (selected.value.sequence[step.value] ?? selected.value.sequence[0]!),
-  ),
+  getSeal(selected.value.sequence[step.value] ?? selected.value.sequence[0]!),
 )
 
 function reset() {
@@ -147,11 +141,6 @@ function onResult(result: RecognitionResult) {
   }
   const seal = stabilizer.push(result.seal, result.confidence, now)
   if (!seal) return
-  if (mode.value === 'seal') {
-    wrong.value = seal !== selectedSeal.value
-    feedback.value = wrong.value ? `当前为${getSeal(seal).name}印` : `${getSeal(seal).name}印已确认`
-    return
-  }
   const response = matcher.push(seal, now)
   step.value = matcher.step
   wrong.value = response === 'wrong'
@@ -198,15 +187,6 @@ const cameraVisible = computed(() => status.value === 'live' || status.value ===
 
 function selectJutsu(id: JutsuId) {
   void router.replace({ path: '/', query: { jutsu: id } })
-}
-function switchMode(value: 'jutsu' | 'seal') {
-  void router.replace({
-    path: '/',
-    query: value === 'seal' ? { seal: selectedSeal.value } : { jutsu: selectedId.value },
-  })
-}
-function chooseSeal(id: SealId) {
-  void router.replace({ path: '/', query: { seal: id } })
 }
 function begin() {
   prepare()
@@ -258,13 +238,16 @@ function fullscreen() {
 watch(
   () => route.query,
   () => {
-    const jutsu = JUTSUS.value.find((entry) => entry.id === route.query.jutsu),
-      seal = SEALS.value.find((entry) => entry.id === route.query.seal)
+    const jutsu = JUTSUS.value.find((entry) => entry.id === route.query.jutsu)
+    if (route.query.seal !== undefined) {
+      void router.replace(
+        jutsu
+          ? { path: '/', query: { ...route.query, seal: undefined } }
+          : { path: '/gallery', query: { tab: 'seals' } },
+      )
+      return
+    }
     if (jutsu) selectedId.value = jutsu.id
-    if (seal) {
-      selectedSeal.value = seal.id
-      mode.value = 'seal'
-    } else mode.value = 'jutsu'
     reset()
     void nextTick(() => {
       const list = jutsuOptions.value
@@ -284,7 +267,7 @@ watch(status, (value) => {
 })
 onMounted(() => {
   timer = setInterval(() => {
-    if (status.value === 'live' && mode.value === 'jutsu' && matcher.tick(performance.now())) {
+    if (status.value === 'live' && matcher.tick(performance.now())) {
       step.value = 0
       feedback.value = '已重新开始'
       wrong.value = false
@@ -301,17 +284,9 @@ onBeforeUnmount(() => {
   <div class="workbench">
     <section class="practice-column" aria-label="摄像头修炼区">
       <div class="section-topline">
-        <div class="mode-control" aria-label="练习模式">
-          <button :class="{ selected: mode === 'jutsu' }" @click="switchMode('jutsu')">
-            忍术修炼</button
-          ><button :class="{ selected: mode === 'seal' }" @click="switchMode('seal')">
-            单印练习
-          </button>
-        </div>
+        <h2 class="practice-heading">忍术修炼</h2>
         <span class="session-label">{{
-          mode === 'seal'
-            ? '十二基础印'
-            : '卷轴 ' + String(JUTSUS.findIndex((j) => j.id === selectedId) + 1).padStart(2, '0')
+          '卷轴 ' + String(JUTSUS.findIndex((j) => j.id === selectedId) + 1).padStart(2, '0')
         }}</span>
       </div>
       <div
@@ -357,12 +332,8 @@ onBeforeUnmount(() => {
           class="stage-caption"
           :data-category-glyph="selected.category[0] || '忍'"
         >
-          <span class="vertical-title">{{
-            mode === 'seal' ? nextSeal.name + '之印' : selected.shortName
-          }}</span
-          ><span class="stage-subtitle">{{
-            mode === 'seal' ? nextSeal.reading : selected.category
-          }}</span>
+          <span class="vertical-title">{{ selected.shortName }}</span
+          ><span class="stage-subtitle">{{ selected.category }}</span>
         </div>
         <div v-if="status === 'paused'" class="paused-overlay">
           <button class="primary-button" @click="begin"><Play :size="17" />继续修炼</button>
@@ -417,7 +388,7 @@ onBeforeUnmount(() => {
           </button>
         </div>
         <button
-          v-if="mode === 'jutsu' && selected.effect"
+          v-if="selected.effect"
           class="text-button preview-button"
           :disabled="casting"
           @click="preview"
@@ -430,7 +401,7 @@ onBeforeUnmount(() => {
       </div>
       <CloudStatus @rewards="queueRewards" />
       <NinjaReward :ninjas="rewards" @dismiss="rewards = []" />
-      <div v-if="mode === 'jutsu'" class="sequence-section">
+      <div class="sequence-section">
         <div class="section-title">
           <h2>结印顺序</h2>
           <span
@@ -461,17 +432,6 @@ onBeforeUnmount(() => {
           /></template>
         </div>
       </div>
-      <div v-else class="single-seal-picker">
-        <button
-          v-for="seal in SEALS"
-          :key="seal.id"
-          :class="{ selected: seal.id === selectedSeal }"
-          :aria-label="`练习${seal.name}印`"
-          @click="chooseSeal(seal.id)"
-        >
-          {{ seal.name }}
-        </button>
-      </div>
       <div class="recognition-strip" :class="{ wrong }">
         <span class="recognition-icon"><ScanLine :size="18" /></span><span>{{ feedback }}</span
         ><span v-if="status === 'live' && recognized" class="confidence">{{
@@ -494,7 +454,7 @@ onBeforeUnmount(() => {
             class="jutsu-option"
             :data-jutsu="jutsu.id"
             :data-category="jutsu.category"
-            :class="{ selected: mode === 'jutsu' && selectedId === jutsu.id }"
+            :class="{ selected: selectedId === jutsu.id }"
             @click="selectJutsu(jutsu.id)"
           >
             <span class="jutsu-mini" :class="{ placeholder: !jutsu.effect }"
@@ -518,7 +478,7 @@ onBeforeUnmount(() => {
       <div class="seal-instruction">
         <div class="instruction-header">
           <div>
-            <span class="eyebrow">{{ mode === 'seal' ? '基础结印' : '当前结印' }}</span>
+            <span class="eyebrow">当前结印</span>
             <h2>
               {{ nextSeal.name }}<span>{{ nextSeal.animal }}之印</span>
             </h2>

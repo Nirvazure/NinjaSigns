@@ -140,6 +140,7 @@ a {
   display: flex;
   align-items: center;
   gap: 16px;
+  flex-shrink: 0;
 }
 .brand-mark {
   display: block;
@@ -157,54 +158,20 @@ a {
   font: 8px/1.6 var(--pixel);
   letter-spacing: 0.13em;
 }
-.village-label {
-  border-left: 1px solid #f7edcf45;
-  padding-left: 24px;
-  font: 24px var(--display);
-}
-.village-label span {
-  display: block;
-  margin-top: 6px;
-  font: 12px var(--body);
-  color: #d1c5a7;
-}
-.collection-summary {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-height: 48px;
-}
-.collection-summary > span {
-  font-size: 12px;
-}
-.collection-summary strong {
-  display: block;
-  margin-top: 8px;
-  font: 16px var(--pixel);
-}
-.collection-summary small {
-  font: 12px var(--body);
-  color: #d1c5a7;
-}
-.navigation-wrap {
-  background: var(--paper-light);
-  border-bottom: 2px solid var(--ink);
-}
 .main-nav {
   display: flex;
   gap: 8px;
   align-items: center;
-  max-width: 1376px;
-  margin: auto;
-  padding: 12px 40px;
+  margin-left: auto;
 }
 .main-nav > a,
 .future-nav {
   min-height: 48px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 20px;
+  gap: 8px;
+  padding: 8px 12px;
+  white-space: nowrap;
   border: 2px solid transparent;
   font-size: 14px;
   font-weight: 600;
@@ -213,31 +180,26 @@ a {
   position: relative;
 }
 .main-nav > a:hover {
-  background: var(--paper);
+  background: #f7edcf14;
 }
 .main-nav > a.active {
   background: var(--green);
   color: var(--paper-light);
-  border-color: var(--ink);
-  box-shadow: 3px 3px 0 var(--ink);
+  border-color: #a7b58b;
+  box-shadow: 3px 3px 0 #131810;
 }
 .nav-number {
   font: 9px var(--pixel);
   opacity: 0.75;
 }
 .future-nav {
-  color: var(--muted);
+  color: #c4bda6;
 }
 .future-nav small {
   border: 1px solid var(--line);
   padding: 3px 6px;
   font-size: 12px;
   font-weight: 400;
-}
-.nav-note {
-  margin-left: auto;
-  font-size: 12px;
-  color: var(--muted);
 }
 #main {
   width: 100%;
@@ -297,6 +259,9 @@ a {
   gap: 12px;
   margin-bottom: 16px;
   order: 1;
+}
+.practice-heading {
+  font: 24px var(--display);
 }
 .mode-control {
   display: inline-flex;
@@ -635,8 +600,7 @@ a {
   font-size: 12px;
   color: var(--muted);
 }
-.sequence-section,
-.single-seal-picker {
+.sequence-section {
   order: 3;
   margin-top: 20px;
   padding: 18px 20px;
@@ -993,29 +957,6 @@ a {
 .error-message svg {
   margin-top: 3px;
 }
-.single-seal-picker {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(44px, 1fr));
-  gap: 12px;
-}
-.single-seal-picker button {
-  min-width: 44px;
-  min-height: 44px;
-  padding: 6px;
-  border: 2px solid var(--line);
-  background: var(--paper);
-  color: var(--ink);
-  font: 30px var(--display);
-}
-.single-seal-picker button.selected {
-  border-color: var(--red);
-  background: var(--red);
-  color: var(--paper-light);
-  box-shadow: 3px 3px 0 var(--ink);
-}
-.single-seal-picker button:hover:not(.selected) {
-  border-color: var(--red);
-}
 .app-footer {
   display: flex;
   justify-content: space-between;
@@ -1163,12 +1104,18 @@ a {
   min-height: 184px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  justify-content: center;
+  gap: 12px;
   padding: 20px 24px;
   color: var(--paper-light);
   background: var(--element-ink);
   background-image: repeating-linear-gradient(90deg, transparent 0 7px, #f7edcf03 7px 8px);
   border-bottom: 3px double var(--element);
+}
+.jutsu-cover-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 .jutsu-cover::after {
   content: '';
@@ -1187,20 +1134,6 @@ a {
   object-fit: cover;
   opacity: 0.48;
   mask-image: linear-gradient(90deg, transparent, #000 60%);
-}
-.jutsu-card-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  font-size: 12px;
-}
-.jutsu-archive-number {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  color: var(--element-light);
-  letter-spacing: 0.06em;
 }
 .mastery-badge {
   display: inline-flex;
@@ -1222,9 +1155,10 @@ a {
 .jutsu-card .cover-title {
   position: relative;
   z-index: 1;
-  max-width: 85%;
+  flex: 1;
+  min-width: 0;
   margin: 0;
-  font: 34px/1.3 var(--display);
+  font: 32px/1.3 var(--display);
   text-wrap: balance;
   overflow-wrap: anywhere;
 }
@@ -1243,15 +1177,9 @@ a {
   font: 78px/1 var(--display);
   transform: rotate(-12deg);
 }
-.jutsu-cover-caption {
-  margin-top: auto;
-  color: var(--element-light);
-  font-size: 12px;
-  letter-spacing: 0.12em;
-}
 .jutsu-card-body {
   min-width: 0;
-  padding: 0 24px 24px;
+  padding: 0 20px 20px;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -1263,6 +1191,28 @@ a {
   gap: 8px 12px;
   font-size: 12px;
   line-height: 1.5;
+}
+.jutsu-cover .jutsu-attributes {
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px solid #f7edcf30;
+}
+.jutsu-cover .jutsu-nature-copy strong {
+  font-size: 15px;
+}
+.jutsu-cover .jutsu-element,
+.jutsu-cover .jutsu-attack,
+.jutsu-cover .jutsu-attack-label svg {
+  color: var(--paper-light);
+}
+.jutsu-cover .compact .jutsu-nature-mark {
+  color: var(--element-light);
+  border-color: var(--element-light);
+  background: transparent;
+}
+.jutsu-cover .jutsu-attack b {
+  font-size: 18px;
+  color: var(--paper-light);
 }
 .jutsu-element,
 .jutsu-attack,
@@ -1370,21 +1320,19 @@ a {
 .jutsu-option-copy > .jutsu-attributes {
   gap: 5px 10px;
 }
-.jutsu-card .jutsu-description {
-  min-height: 50px;
-  margin-top: 16px;
-  color: var(--muted);
+.jutsu-cover .jutsu-description {
+  color: var(--paper-light);
   font-size: 14px;
-  line-height: 1.8;
+  line-height: 1.65;
 }
 .jutsu-seal-scroll {
-  margin: 20px 0 24px;
+  margin: 16px 0;
 }
 .jutsu-seal-heading {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   color: var(--ink);
   font-size: 13px;
 }
@@ -1398,9 +1346,9 @@ a {
   font-size: 12px;
 }
 .gallery-sequence {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -1412,9 +1360,9 @@ a {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
-  min-height: 64px;
-  padding: 10px 4px 6px;
+  flex: 0 0 44px;
+  min-height: 48px;
+  padding: 12px 4px 4px;
   border: 1px solid color-mix(in srgb, var(--element) 40%, var(--line));
   background: color-mix(in srgb, var(--element-soft) 55%, var(--paper-light));
   box-shadow: inset 0 0 0 3px var(--paper-light);
@@ -1428,18 +1376,14 @@ a {
   font-variant-numeric: tabular-nums;
 }
 .seal-step-glyph {
-  font: 28px/1 var(--display);
+  font: 25px/1 var(--display);
   color: var(--element);
-}
-.gallery-sequence small {
-  color: var(--muted);
-  font-size: 12px;
 }
 .jutsu-card-actions {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding-top: 16px;
+  padding-top: 12px;
   border-top: 1px solid var(--line);
   margin-top: auto;
 }
@@ -1572,9 +1516,19 @@ a {
   padding: 20px 24px;
 }
 @media (max-width: 1100px) {
-  .header-inner,
-  .main-nav {
+  .header-inner {
     padding-inline: 24px;
+    flex-wrap: wrap;
+  }
+  .main-nav {
+    order: 3;
+    flex-basis: 100%;
+    margin-left: 0;
+    padding-top: 12px;
+    border-top: 1px solid #f7edcf30;
+  }
+  .account-control {
+    margin-left: auto;
   }
   #main {
     padding-inline: 24px;
@@ -1593,11 +1547,8 @@ a {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 28px 20px;
   }
-  .jutsu-card h2 {
+  .jutsu-card .cover-title {
     font-size: 30px;
-  }
-  .jutsu-card-meta {
-    flex-wrap: wrap;
   }
 }
 @media (max-width: 900px) {
@@ -1636,9 +1587,6 @@ a {
   .seal-gallery {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-  .nav-note {
-    display: none;
-  }
 }
 @media (max-width: 600px) {
   .header-inner {
@@ -1658,34 +1606,20 @@ a {
   .brand-text small {
     font-size: 7px;
   }
-  .village-label {
-    display: none;
-  }
-  .collection-summary {
-    gap: 6px;
-  }
-  .collection-summary > svg {
-    display: none;
-  }
-  .collection-summary strong {
-    font-size: 13px;
-  }
   .main-nav {
-    padding: 12px 16px;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 4px;
   }
   .main-nav > a {
-    padding: 8px 11px;
-    font-size: 14px;
+    padding: 8px;
+    font-size: 13px;
   }
   .nav-number {
     display: none;
   }
   .future-nav {
-    width: 100%;
-    padding: 4px 0 0;
-    min-height: 32px;
+    padding: 8px;
+    min-height: 44px;
     font-size: 12px;
     gap: 6px;
   }
@@ -1770,8 +1704,7 @@ a {
   .stage-subtitle {
     font-size: 12px;
   }
-  .sequence-section,
-  .single-seal-picker {
+  .sequence-section {
     margin-top: 16px;
     padding: 16px 12px;
   }
@@ -1787,11 +1720,6 @@ a {
   }
   .sequence-number {
     font-size: 7px;
-  }
-  .single-seal-picker {
-    grid-template-columns: repeat(6, minmax(44px, 1fr));
-    gap: 8px;
-    padding-inline: 8px;
   }
   .camera-toolbar {
     padding: 18px 0;
@@ -1849,12 +1777,11 @@ a {
   .jutsu-card-body {
     padding: 0 20px 20px;
   }
-  .jutsu-card h2 {
-    font-size: 34px;
+  .jutsu-card .cover-title {
+    font-size: 30px;
   }
   .jutsu-card .jutsu-description {
-    min-height: 0;
-    font-size: 16px;
+    font-size: 14px;
   }
   .seal-gallery {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1903,18 +1830,6 @@ a {
     top: 28%;
   }
 }
-.header-collections {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
-.ninja-collection-summary {
-  padding-left: 20px;
-  border-left: 1px solid var(--line);
-}
-.collection-summary strong {
-  white-space: nowrap;
-}
 .ninja-gallery-intro {
   display: flex;
   justify-content: space-between;
@@ -1936,6 +1851,8 @@ a {
 }
 .ninja-card {
   min-width: 0;
+  display: flex;
+  flex-direction: column;
   border: 2px solid var(--line);
   background: var(--paper-light);
   box-shadow: var(--surface-shadow);
@@ -1951,8 +1868,8 @@ a {
   position: relative;
   display: grid;
   place-items: center;
-  height: 244px;
-  padding: 24px 12px 36px;
+  height: 216px;
+  padding: 12px;
   background: #fffdf7;
   border-bottom: 1px solid var(--line);
 }
@@ -1977,31 +1894,39 @@ a {
   color: var(--muted);
 }
 .ninja-status {
-  position: absolute;
-  bottom: 10px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 3px 8px;
+  flex-shrink: 0;
+  padding: 3px 5px;
   border: 1px solid var(--line);
   background: var(--paper-light);
   color: var(--muted);
-  font-size: 12px;
+  font-size: 11px;
+  white-space: nowrap;
 }
 .ninja-status.owned {
   border-color: var(--green);
   color: var(--green);
 }
 .ninja-card-body {
-  padding: 16px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 8px;
+}
+.ninja-card-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
 }
 .ninja-card h3 {
-  min-height: 68px;
+  flex: 1;
+  min-width: 0;
   font: 26px/1.3 var(--display);
   overflow-wrap: anywhere;
 }
 .ninja-condition {
-  min-height: 44px;
   font-size: 13px;
   line-height: 1.6;
   color: var(--muted);
@@ -2010,15 +1935,14 @@ a {
   display: flex;
   justify-content: space-between;
   gap: 6px;
-  margin-top: 12px;
   font-size: 12px;
 }
 .ninja-card progress {
   appearance: none;
   display: block;
   width: 100%;
-  height: 8px;
-  margin: 8px 0 16px;
+  height: 5px;
+  margin: 5px 0 0;
   border: 0;
   background: var(--paper-deep);
 }
@@ -2033,6 +1957,9 @@ a {
 }
 .ninja-card button {
   width: 100%;
+  margin-top: auto;
+  min-height: 44px;
+  padding: 8px;
 }
 .ninja-card button[aria-pressed='true'] {
   background: var(--green);
@@ -2151,12 +2078,6 @@ a {
   }
 }
 @media (max-width: 600px) {
-  .header-collections {
-    gap: 12px;
-  }
-  .ninja-collection-summary {
-    padding-left: 12px;
-  }
   .ninja-gallery-intro {
     flex-direction: column;
     align-items: start;
@@ -2170,7 +2091,7 @@ a {
     gap: 16px;
   }
   .ninja-portrait {
-    height: 218px;
+    height: 182px;
   }
   .ninja-portrait img {
     width: 110px;
@@ -2181,9 +2102,6 @@ a {
   }
   .ninja-card h3 {
     font-size: 24px;
-  }
-  .ninja-condition {
-    min-height: 63px;
   }
   .companion-panel {
     gap: 16px;
@@ -2221,11 +2139,32 @@ a {
 .account-control img {
   border-radius: 50%;
 }
-.account-control > span {
+.account-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 6px 10px;
+  border: 1px solid #f7edcf45;
+}
+.account-link:hover,
+.account-link[aria-current='page'] {
+  background: #f7edcf14;
+  border-color: var(--paper-light);
+}
+.account-link-copy {
+  display: grid;
+  gap: 4px;
+}
+.account-link-copy > span {
   max-width: 120px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.account-link-copy small {
+  color: #d1c5a7;
+  font-size: 11px;
 }
 .account-control .secondary-button {
   min-height: 44px;
@@ -2262,14 +2201,135 @@ a {
   margin-left: 8px;
   text-decoration: underline;
 }
+.account-page {
+  max-width: 960px;
+  margin: 0 auto;
+}
+.account-profile {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 28px;
+  background: var(--paper-light);
+  border: 2px solid var(--ink);
+  box-shadow: var(--surface-shadow);
+}
+.account-avatar {
+  width: 72px;
+  height: 72px;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+.account-avatar-placeholder {
+  display: grid;
+  place-items: center;
+  background: var(--green);
+  color: var(--paper-light);
+}
+.account-identity {
+  min-width: 0;
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+.account-identity h2 {
+  margin: 8px 0;
+  font: 32px/1.2 var(--display);
+}
+.account-identity > p:last-child {
+  color: var(--muted);
+  font-size: 13px;
+}
+.account-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin: 28px 0;
+}
+.account-stat {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 28px;
+  color: var(--paper-light);
+  background: var(--ink);
+  border: 2px solid var(--ink);
+  box-shadow: var(--surface-shadow);
+}
+.account-stat:hover {
+  background: var(--green);
+}
+.account-stat > div {
+  flex: 1;
+}
+.account-stat h2 {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+.account-stat strong {
+  font: 28px var(--pixel);
+}
+.account-stat p > span {
+  color: #d1c5a7;
+  font-size: 14px;
+}
+.account-catalog-status {
+  margin-top: 24px;
+  line-height: 1.8;
+}
+.account-catalog-status button {
+  margin-top: 12px;
+}
 @media (max-width: 600px) {
-  .header-inner {
-    flex-wrap: wrap;
+  .brand-text {
+    font-size: 23px;
   }
-  .account-control {
-    flex-basis: 100%;
+  .brand {
+    gap: 8px;
+  }
+  .brand-mark {
+    width: 40px;
+    height: 40px;
+  }
+  .account-link {
+    gap: 6px;
+    padding: 6px 8px;
+  }
+  .account-link img {
+    display: none;
+  }
+  .account-link-copy > span {
+    max-width: 76px;
   }
   .account-control .secondary-button {
     min-height: 44px;
+    padding: 8px;
+  }
+  .account-profile {
+    padding: 20px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .account-profile > button {
+    width: 100%;
+  }
+  .account-stats {
+    gap: 16px;
+    margin: 24px 0;
+  }
+  .account-stat {
+    padding: 20px 16px;
+    gap: 12px;
+  }
+  .account-stat > svg {
+    display: none;
+  }
+  .account-stat strong {
+    font-size: 22px;
+  }
+  .account-page .page-heading {
+    flex-wrap: wrap;
   }
 }

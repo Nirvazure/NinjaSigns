@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Check, LockKeyhole, ArrowRight } from 'lucide-vue-next'
+import { Check, ArrowRight } from 'lucide-vue-next'
 import { useNinjaCollection } from '../composables/useNinjaCollection'
 
 const { entries, ready, canSelect, unlockedCount, selectedNinja, selectNinja } =
@@ -31,23 +31,26 @@ const { entries, ready, canSelect, unlockedCount, selectedNinja, selectNinja } =
             width="132"
             height="189"
           />
-          <span class="ninja-status" :class="{ owned: entry.unlocked }">
-            <Check v-if="entry.unlocked" :size="14" /><LockKeyhole v-else :size="14" />
-            {{ entry.unlocked ? '已解锁' : '未解锁' }}
-          </span>
         </div>
         <div class="ninja-card-body">
-          <h3>{{ entry.ninja.name }}</h3>
-          <p class="ninja-condition">{{ entry.condition }}</p>
-          <div class="ninja-progress-copy">
-            <span>{{ entry.unlocked ? '修炼达成' : '修炼进度' }}</span>
-            <span>{{ entry.current }} / {{ entry.required }}</span>
+          <div class="ninja-card-heading">
+            <h3>{{ entry.ninja.name }}</h3>
+            <span class="ninja-status" :class="{ owned: entry.unlocked }">
+              {{ entry.unlocked ? '已解锁' : '未解锁' }}
+            </span>
           </div>
-          <progress
-            :value="entry.current"
-            :max="entry.required"
-            :aria-label="`${entry.ninja.name}解锁进度`"
-          />
+          <p class="ninja-condition">{{ entry.condition }}</p>
+          <div v-if="!entry.unlocked" class="ninja-unlock-progress">
+            <div class="ninja-progress-copy">
+              <span>解锁进度</span>
+              <span>{{ entry.current }} / {{ entry.required }}</span>
+            </div>
+            <progress
+              :value="entry.current"
+              :max="entry.required"
+              :aria-label="`${entry.ninja.name}解锁进度`"
+            />
+          </div>
           <button
             class="secondary-button"
             :disabled="!ready || !canSelect || !entry.unlocked"

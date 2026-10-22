@@ -50,16 +50,16 @@ for (const guest of [true, false]) {
     await expect(page.locator('.recognition-strip')).toContainText('施术成功 · 松手后继续')
     if (guest) {
       expect(backend.requests).toHaveLength(0)
-      await expect(page.locator('.header-collections')).toContainText('0 / 28')
+      await expect(page.getByRole('link', { name: '个人中心', exact: true })).toHaveCount(0)
     } else {
       await expect(page.locator('.cloud-status')).toContainText('未保存')
       expect((await backend.state()).mastery[jutsu.id]).toBeUndefined()
-      await expect(page.locator('.header-collections')).toContainText('0 / 28')
       await page.getByRole('button', { name: '重试保存与读取' }).click()
       await expect.poll(async () => (await backend.state()).mastery[jutsu.id]?.casts).toBe(1)
       expect(backend.requests).toHaveLength(2)
       expect(new Set(backend.requests).size).toBe(1)
-      await expect(page.locator('.header-collections')).toContainText('1 / 28')
+      await page.getByRole('link', { name: '个人中心', exact: true }).click()
+      await expect(page.locator('.account-stats')).toContainText('1 / 28')
     }
   })
 }
@@ -81,10 +81,18 @@ test('an old account cast response cannot enter the next account', async ({ page
       )
   }
   await expect.poll(() => backend.requests.length).toBe(1)
-  await page.getByRole('button', { name: '退出' }).click()
+  const pendingCast = page.waitForResponse('**/rest/v1/rpc/record_cast')
+  await page.getByRole('link', { name: '个人中心', exact: true }).click()
+  await page.getByRole('button', { name: '退出登录', exact: true }).click()
+  await pendingCast
+  await expect(page.locator('.account-stats')).toHaveCount(0)
+  await page.getByRole('link', { name: '忍术展览馆' }).click()
+  await expect(page.locator('.mastery-badge').filter({ hasText: '未掌握' })).toHaveCount(
+    JUTSUS.length,
+  )
   await backend.signIn(accountB)
-  await page.reload()
+  await page.goto('/account')
   await expect(page.locator('.account-control')).toContainText('修炼者 B')
-  await expect(page.locator('.header-collections')).toContainText('0 / 28')
+  await expect(page.locator('.account-stats')).toContainText('0 / 28')
   expect((await backend.state(accountB)).mastery).toEqual({})
 })

@@ -1,13 +1,19 @@
 <script setup lang="ts">
 import { useAuth } from '../composables/useAuth'
 import { useRoute } from '#imports'
-const { auth, player, logout } = useAuth()
+const { auth, player } = useAuth()
 const route = useRoute()
 </script>
 <template>
   <div class="account-control">
     <span v-if="!auth.ready" role="status">正在恢复账号…</span>
-    <template v-else-if="auth.user">
+    <NuxtLink
+      v-else-if="auth.user"
+      to="/account"
+      class="account-link"
+      aria-label="个人中心"
+      :aria-current="route.path === '/account' ? 'page' : undefined"
+    >
       <img
         v-if="player.state?.avatarUrl"
         :src="player.state.avatarUrl"
@@ -16,9 +22,11 @@ const route = useRoute()
         height="32"
         referrerpolicy="no-referrer"
       />
-      <span>{{ player.state?.displayName || '忍者' }}</span>
-      <button class="text-button" :disabled="auth.busy" @click="logout">退出</button>
-    </template>
+      <span class="account-link-copy"
+        ><span>{{ player.state?.displayName || '忍者' }}</span
+        ><small>个人中心</small></span
+      >
+    </NuxtLink>
     <NuxtLink
       v-else
       class="secondary-button"

@@ -1,7 +1,7 @@
 import { replayCamera, setReplaySeal } from './replay'
 import { test, expect } from './fixtures'
 import type { Page } from '@playwright/test'
-import { JUTSUS } from '../../supabase/seed/catalog'
+import { JUTSUS, SEALS } from '../../supabase/seed/catalog'
 
 const cameraReadyTimeout = 30_000
 const animatedJutsus = JUTSUS.filter((jutsu) => jutsu.effect)
@@ -68,9 +68,16 @@ for (const viewport of [
       await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
     ).toBe(true)
     await page.screenshot({ path: `docs/validation/seals-${viewport.width}.png`, fullPage: true })
-    await page.getByRole('link', { name: '练习此印' }).first().click()
-    await expect(page).toHaveURL(/seal=rat/)
-    await expect(page.locator('.instruction-header h2')).toContainText('子')
+    for (const [index, seal] of SEALS.entries()) {
+      const card = page.locator('.seal-card').nth(index)
+      await expect(card.getByRole('heading')).toContainText(seal.name)
+      await expect(card.getByRole('img', { name: `${seal.name}印手势示范` })).toHaveAttribute(
+        'src',
+        seal.image,
+      )
+      await expect(card.locator('p')).toHaveText(seal.hint)
+    }
+    await expect(page.getByRole('link', { name: '练习此印' })).toHaveCount(0)
     expect(errors).toEqual([])
   })
 }
@@ -169,21 +176,28 @@ test('reference video replay traverses the real model and casts all three jutsu'
   await expect(page.locator('.mastery-badge').filter({ hasText: '已掌握' })).toHaveCount(3)
 })
 
-test('single-seal replay does not grant a jutsu mastery record', async ({ page }) => {
-  await replayCamera(page)
+test('practice offers jutsu training without single-seal controls', async ({ page }) => {
+  await page.goto('/?jutsu=summoning')
+  await expect(page.locator('.jutsu-option.selected')).toHaveAttribute('data-jutsu', 'summoning')
+  await expect(page.getByRole('button', { name: '单印练习', exact: true })).toHaveCount(0)
+  await expect(page.locator('.single-seal-picker')).toHaveCount(0)
+  await expect(page.getByRole('button', { name: '开启摄像头', exact: true })).toBeVisible()
+})
+
+test('legacy single-seal links open the twelve-seal reference gallery', async ({ page }) => {
   await page.goto('/?seal=rat')
-  await page.getByRole('button', { name: '开启摄像头', exact: true }).click()
-  await expect(page.locator('.stage-status')).toContainText('识别中', {
-    timeout: cameraReadyTimeout,
-  })
-  await setReplaySeal(page, 'rat')
-  await expect(page.locator('.recognition-strip')).toContainText('子印已确认')
-  await page.getByRole('link', { name: '忍术展览馆' }).click()
-  await expect(page.locator('.mastery-badge').filter({ hasText: '未掌握' })).toHaveCount(
-    JUTSUS.length,
-  )
-  await page.getByRole('link', { name: '查看忍者收藏' }).click()
-  await expect(page.locator('.ninja-card.unlocked')).toHaveCount(1)
+  await expect(page).toHaveURL(/\/gallery\?tab=seals$/)
+  await expect(page.locator('.seal-card')).toHaveCount(12)
+  await expect(page.getByRole('link', { name: '练习此印' })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: '开启摄像头', exact: true })).toHaveCount(0)
+})
+
+test('a valid jutsu takes priority over a legacy seal parameter', async ({ page }) => {
+  await page.goto('/?jutsu=summoning&seal=rat')
+  await expect(page).toHaveURL(/\/\?jutsu=summoning$/)
+  await expect(page.locator('.jutsu-option.selected')).toHaveAttribute('data-jutsu', 'summoning')
+  await expect(page.getByRole('button', { name: '开启摄像头', exact: true })).toBeVisible()
+  await expect(page.locator('.single-seal-picker')).toHaveCount(0)
 })
 
 for (const jutsu of replayPracticeOnlyJutsus) {
@@ -309,7 +323,7 @@ test('real replay grants merged rewards only after the effect and never repeats 
   await backend.seed(['false-darkness', 'black-panther'])
   await backend.signIn()
   await page.goto('/?jutsu=chidori')
-  await expect(page.getByRole('link', { name: '查看忍者收藏' })).toContainText('1')
+  expect((await backend.state()).unlockedIds).toHaveLength(1)
   await expect(page.locator('.ninja-reward')).toHaveCount(0)
   await page.getByRole('button', { name: '开启摄像头', exact: true }).click()
   await expect(page.locator('.stage-status')).toContainText('识别中', {
@@ -317,7 +331,7 @@ test('real replay grants merged rewards only after the effect and never repeats 
   })
   await setReplaySeal(page, 'rat')
   await expect(page.locator('.recognition-strip')).toContainText('当前为子印')
-  await expect(page.getByRole('link', { name: '查看忍者收藏' })).toContainText('1')
+  expect((await backend.state()).unlockedIds).toHaveLength(1)
   await setReplaySeal(page, null)
   const jutsu = JUTSUS.find((entry) => entry.id === 'chidori')!
   for (let cast = 0; cast < 2; cast++) {

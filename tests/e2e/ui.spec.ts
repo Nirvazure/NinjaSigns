@@ -8,12 +8,10 @@ for (const viewport of [
     page,
   }) => {
     await page.setViewportSize(viewport)
-    await page.goto('/?seal=rat')
+    await page.goto('/?jutsu=summoning')
     await expect(page.getByRole('button', { name: '开启摄像头', exact: true })).toBeVisible()
     const sizes = await page
-      .locator(
-        '.single-seal-picker button, .camera-toolbar button, .mode-control button, .stage-icon',
-      )
+      .locator('.jutsu-option, .camera-toolbar button, .stage-icon')
       .evaluateAll((buttons) =>
         buttons.map((button) => {
           const rect = button.getBoundingClientRect()
@@ -23,7 +21,7 @@ for (const viewport of [
     expect(sizes.every(({ width, height }) => width >= 44 && height >= 44)).toBe(true)
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
     await page.screenshot({
-      path: `docs/validation/ui-single-${viewport.width}x${viewport.height}.png`,
+      path: `docs/validation/ui-jutsu-${viewport.width}x${viewport.height}.png`,
       fullPage: true,
     })
     await page.goto('/gallery?tab=seals')

@@ -45,7 +45,7 @@ yarn auth:configure
 
 写入函数从 `auth.uid()` 获取身份，固定空 `search_path`，显式完整 schema 名，只授予 authenticated 执行权限。内部辅助函数不允许客户端执行。私有迁移账本同样启用 RLS 并撤销客户端权限。
 
-客户端通过账号 epoch 丢弃上一账号迟到响应，通过单调版本防止旧状态覆盖新状态。账号切换清空进度、奖励和当前页面待重试记录，并暂停/reset 当前练习。真实施术立即播放演出，保存成功后才更新收藏和发奖；预览与单印练习不提交记录。
+客户端通过账号 epoch 丢弃上一账号迟到响应，通过单调版本防止旧状态覆盖新状态。账号切换清空进度、奖励和当前页面待重试记录，并暂停/reset 当前练习。真实施术立即播放演出，保存成功后才更新收藏和发奖；效果预览不提交记录。
 
 旧存储只删除 `naruto-spiritism.progress.v1`、`naruto-spiritism.companion.v1`、`naruto-spiritism.ninja-unlocks.v1`。存储不可访问不阻挡启动，旧内容不读取、不迁移、不备份。
 

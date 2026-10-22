@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
 import { useRoute, useRouter, useSeoMeta } from '#imports'
-import { ScrollText, ArrowUpRight, Eye, ArrowRight, X } from 'lucide-vue-next'
+import { ScrollText, Eye, ArrowRight, X } from 'lucide-vue-next'
 import { useCatalog } from '../composables/useCatalog'
 import { useMastery } from '../composables/useMastery'
 import { useCastAudio } from '../composables/useCastAudio'
@@ -135,9 +135,6 @@ function trapDialogFocus(event: { key: string; shiftKey: boolean; preventDefault
           {{ seal.name }}<span>{{ seal.animal }}之印</span>
         </h2>
         <p>{{ seal.hint }}</p>
-        <NuxtLink :to="`/?seal=${seal.id}`" class="quiet-link"
-          >练习此印<ArrowUpRight :size="15"
-        /></NuxtLink>
       </div>
     </article>
   </div>

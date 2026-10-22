@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Check, ScrollText, Hand, ArrowUpRight, Eye } from 'lucide-vue-next'
+import { Check, Hand, ArrowUpRight, Eye } from 'lucide-vue-next'
 import { useCatalog } from '../composables/useCatalog'
 import type { JutsuDefinition } from '../domain/types'
 import JutsuAttributes from './JutsuAttributes.vue'
@@ -22,30 +22,21 @@ const { getSeal } = useCatalog()
         :loading="index < 3 ? 'eager' : 'lazy'"
         aria-hidden="true"
       />
-      <div class="jutsu-card-meta">
-        <span class="jutsu-archive-number"
-          ><ScrollText :size="14" aria-hidden="true" />忍术之卷 ·
-          {{ String(index + 1).padStart(2, '0') }}</span
-        >
+      <span class="cover-glyph" aria-hidden="true">{{
+        jutsu.id === 'summoning' ? '契' : jutsu.category[0] || '忍'
+      }}</span>
+      <div class="jutsu-cover-heading">
+        <h2 class="cover-title">{{ jutsu.shortName }}</h2>
         <span class="mastery-badge" :class="{ mastered }">
           <Check v-if="mastered" :size="12" aria-hidden="true" />{{
             mastered ? '已掌握' : '未掌握'
           }}
         </span>
       </div>
-      <span class="cover-glyph" aria-hidden="true">{{
-        jutsu.id === 'summoning' ? '契' : jutsu.category[0] || '忍'
-      }}</span>
-      <h2 class="cover-title">{{ jutsu.shortName }}</h2>
-      <span class="jutsu-cover-caption" aria-hidden="true">忍术秘卷 · 结印修行</span>
+      <JutsuAttributes :category="jutsu.category" :attack-power="jutsu.attackPower" />
+      <p class="jutsu-description">{{ jutsu.description }}</p>
     </header>
     <div class="jutsu-card-body">
-      <JutsuAttributes
-        :category="jutsu.category"
-        :attack-power="jutsu.attackPower"
-        variant="scroll"
-      />
-      <p class="jutsu-description">{{ jutsu.description }}</p>
       <section class="jutsu-seal-scroll" :aria-label="`${jutsu.shortName}结印`">
         <div class="jutsu-seal-heading">
           <span><Hand :size="15" aria-hidden="true" />结印顺序</span>
@@ -57,7 +48,6 @@ const { getSeal } = useCatalog()
               String(i + 1).padStart(2, '0')
             }}</span>
             <span class="seal-step-glyph">{{ getSeal(seal).name }}</span>
-            <small>{{ getSeal(seal).animal }}印</small>
           </li>
         </ol>
       </section>
