@@ -5,7 +5,7 @@ if (!token)
   throw Error(
     'SUPABASE_ACCESS_TOKEN is required to configure Auth callback URLs (a public/service-role Key cannot manage project configuration).',
   )
-const apiUrl = new URL(process.env.NUXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '')
+const apiUrl = new URL(process.env.SUPABASE_URL || '')
 const projectRef = apiUrl.hostname.split('.')[0]
 if (!/^[a-z]{20}$/.test(projectRef!)) throw Error('A hosted Supabase project URL is required.')
 const origins = (process.env.APP_ORIGINS || 'http://localhost:3000,http://127.0.0.1:3000')
